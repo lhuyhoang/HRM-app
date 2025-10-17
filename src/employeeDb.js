@@ -34,4 +34,4 @@ export const deleteEmployee = (id) => {
     let employees = getAllEmployees();
     employees = employees.filter(emp => emp.id !== id);
     saveEmployees(employees);
-}
+};

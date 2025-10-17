@@ -20,7 +20,6 @@ body {
     min-height: 100vh;
 }
 
-/* Auth Section */
 #auth-container {
     width: 100%;
 }
@@ -34,7 +33,6 @@ body {
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-/* Dashboard */
 #main-dashboard {
     width: 100%;
     height: 100vh;
@@ -95,7 +93,6 @@ header h1 {
     overflow-y: auto;
 }
 
-/* General UI Elements */
 .hidden {
     display: none !important;
 }
@@ -146,7 +143,6 @@ th {
     background-color: var(--secondary-color);
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .dashboard-body {
         flex-direction: column;
