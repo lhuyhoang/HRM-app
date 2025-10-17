@@ -40,11 +40,11 @@ export const renderLogin = (container, onLoginSuccess) => {
             <h2>Đăng nhập HRM</h2>
             <form id="login-form">
                 <div class="form-group">
-                    <label for="username">Tên đăng nhập (admin)</label>
+                    <label for="username">Tên đăng nhập</label>
                     <input type="text" id="username" value="admin" required>
                 </div>
                 <div class="form-group">
-                    <label for="password">Mật khẩu (admin123)</label>
+                    <label for="password">Mật khẩu</label>
                     <input type="password" id="password" value="admin123" required>
                 </div>
                 <button type="submit">Đăng nhập</button>

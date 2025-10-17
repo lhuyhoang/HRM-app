@@ -1,5 +1,5 @@
 import * as EmployeeDB from './employeeDb.js';
-import { createTable, showAlert } from './uiHelpers.js';
+import { createTable, showAlert, showConfirm } from './uiHelpers.js';
 const STORAGE_KEY = 'hrm_leave_requests';
 const readRequests = () => {
     try {
@@ -62,7 +62,6 @@ export const render = (container) => {
     const employeeOptions = employees
         .map((emp) => `<option value="${emp.id}">${emp.name} (${emp.id})</option>`)
         .join('');
-
     container.innerHTML = `
         <h2>Quản lý nghỉ phép</h2>
         <form id="leave-form" class="form-group">
@@ -132,7 +131,7 @@ export const render = (container) => {
         showAlert('Đã tạo yêu cầu nghỉ phép');
         renderTable();
     });
-    tableWrapper.addEventListener('click', (event) => {
+    tableWrapper.addEventListener('click', async (event) => {
         const button = event.target.closest('button[data-action]');
         if (!button) {
             return;
@@ -142,7 +141,6 @@ export const render = (container) => {
             return;
         }
         const action = button.dataset.action;
-
         if (action === 'approve' || action === 'reject') {
             updateStatus(id, action === 'approve' ? 'approved' : 'rejected');
             showAlert('Đã cập nhật trạng thái');
@@ -150,7 +148,7 @@ export const render = (container) => {
             return;
         }
         if (action === 'delete') {
-            const confirmed = window.confirm('Xóa yêu cầu nghỉ phép này?');
+            const confirmed = await showConfirm('Xóa yêu cầu nghỉ phép này?');
             if (!confirmed) {
                 return;
             }

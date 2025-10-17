@@ -20,7 +20,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    z-index: 1000;
+    z-index: 1100;
     pointer-events: none;
 }
 
@@ -55,6 +55,77 @@ body {
     background-color: #495057;
 }
 
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 1100;
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-dialog {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    max-width: 420px;
+    width: calc(100% - 2rem);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+    border-top: 4px solid var(--border-color);
+}
+
+.modal-dialog.modal-success {
+    border-top-color: var(--primary-color);
+}
+
+.modal-dialog.modal-error {
+    border-top-color: var(--danger-color);
+}
+
+.modal-dialog.modal-info {
+    border-top-color: #495057;
+}
+
+.modal-dialog h3 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    font-size: 1.25rem;
+}
+
+.modal-dialog p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.modal-dialog .modal-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.modal-dialog .modal-actions button {
+    min-width: 96px;
+}
+
+.modal-dialog .modal-actions .secondary {
+    background: #adb5bd;
+    color: #fff;
+}
+
+.modal-dialog .modal-actions .primary {
+    background: var(--primary-color);
+    color: #fff;
+}
 #app-container {
     display: flex;
     justify-content: center;

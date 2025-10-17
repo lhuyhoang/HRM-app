@@ -1,4 +1,4 @@
-import { createTable, showAlert } from './uiHelpers.js';
+import { createTable, showAlert, showConfirm } from './uiHelpers.js';
 const DEPARTMENT_KEY = 'hrm_departments';
 const initialData = () => [];
 const saveDepartments = (departments) => {
@@ -93,7 +93,7 @@ export const render = (container) => {
             showAlert(error.message || 'Không thể thêm phòng ban', 'error');
         }
     });
-    container.querySelector('#department-table').addEventListener('click', (event) => {
+    container.querySelector('#department-table').addEventListener('click', async (event) => {
         const button = event.target.closest('button[data-action="delete"]');
         if (!button) {
             return;
@@ -102,7 +102,7 @@ export const render = (container) => {
         if (Number.isNaN(id)) {
             return;
         }
-        const confirmed = window.confirm('Bạn có chắc chắn muốn xóa phòng ban này?');
+        const confirmed = await showConfirm('Bạn có chắc chắn muốn xóa phòng ban này?');
         if (!confirmed) {
             return;
         }

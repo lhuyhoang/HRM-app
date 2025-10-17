@@ -1,5 +1,5 @@
 import * as DeptDB from './department.js';
-import { createTable, showAlert } from './uiHelpers.js';
+import { createTable, showAlert, showConfirm } from './uiHelpers.js';
 const POSITION_KEY = 'hrm_positions';
 const initialData = () => [];
 const savePositions = (positions) => {
@@ -150,7 +150,7 @@ export const render = (container) => {
             }
         });
     }
-    tableWrapper.addEventListener('click', (event) => {
+    tableWrapper.addEventListener('click', async (event) => {
         const button = event.target.closest('button[data-action="delete"]');
         if (!button) {
             return;
@@ -159,7 +159,7 @@ export const render = (container) => {
         if (Number.isNaN(id)) {
             return;
         }
-        const confirmed = window.confirm('Bạn có chắc chắn muốn xóa vị trí này?');
+        const confirmed = await showConfirm('Bạn có chắc chắn muốn xóa vị trí này?');
         if (!confirmed) {
             return;
         }

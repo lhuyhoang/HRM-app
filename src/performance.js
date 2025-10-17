@@ -1,5 +1,5 @@
 import * as EmployeeDB from './employeeDb.js';
-import { createTable, showAlert } from './uiHelpers.js';
+import { createTable, showAlert, showConfirm } from './uiHelpers.js';
 const STORAGE_KEY = 'hrm_performance_reviews';
 const readReviews = () => {
     try {
@@ -121,7 +121,7 @@ export const render = (container) => {
         showAlert('Đã lưu đánh giá');
         renderTable();
     });
-    tableWrapper.addEventListener('click', (event) => {
+    tableWrapper.addEventListener('click', async (event) => {
         const button = event.target.closest('button[data-id]');
         if (!button) {
             return;
@@ -130,7 +130,7 @@ export const render = (container) => {
         if (Number.isNaN(id)) {
             return;
         }
-        const confirmed = window.confirm('Xóa đánh giá này?');
+        const confirmed = await showConfirm('Xóa đánh giá này?');
         if (!confirmed) {
             return;
         }

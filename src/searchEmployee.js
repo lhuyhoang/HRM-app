@@ -1,6 +1,6 @@
 import * as db from './employeeDb.js';
 import * as deptDb from './department.js';
-import { createTable, showAlert } from './uiHelpers.js';
+import { createTable, showAlert, showConfirm } from './uiHelpers.js';
 import { render as renderEditForm } from './editEmployee.js';
 export const render = (container) => {
     const departments = deptDb.getAllDepartments();
@@ -60,15 +60,17 @@ export const render = (container) => {
         resultsContainer.innerHTML = table;
     };
     searchBtn.addEventListener('click', performSearch);
-    resultsContainer.addEventListener('click', (e) => {
+    resultsContainer.addEventListener('click', async (e) => {
         const target = e.target;
         const employeeId = target.dataset.id;
         if (target.classList.contains('delete-btn')) {
-            if (window.confirm(`Bạn có chắc chắn muốn xóa nhân viên có ID ${employeeId}?`)) {
-                db.deleteEmployee(employeeId);
-                showAlert('Xóa nhân viên thành công!');
-                performSearch();
+            const confirmed = await showConfirm(`Bạn có chắc chắn muốn xóa nhân viên có ID ${employeeId}?`);
+            if (!confirmed) {
+                return;
             }
+            db.deleteEmployee(employeeId);
+            showAlert('Xóa nhân viên thành công!');
+            performSearch();
         }
         if (target.classList.contains('edit-btn')) {
             renderEditForm(editContainer, employeeId, () => {
