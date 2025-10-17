@@ -1,7 +1,7 @@
-import * as db from './employeeDbModule.js';
-import * as deptDb from './departmentModule.js';
+import * as db from './employeeDb.js';
+import * as deptDb from './department.js';
 import { createTable, showAlert } from './uiHelpers.js';
-import { render as renderEditForm } from './editEmployeeModule.js';
+import { render as renderEditForm } from './editEmployee.js';
 export const render = (container) => {
     const departments = deptDb.getAllDepartments();
     const deptOptions = departments.map(d => `<option value="${d.id}">${d.name}</option>`).join('');

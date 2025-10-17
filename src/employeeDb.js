@@ -19,7 +19,7 @@ export const findEmployees = (filterFn) => {
 };
 export const addEmployee = (employee) => {
     const employees = getAllEmployees();
-    const newId = `EMP${String(DataTransfer.now()).slice(-6)}`;
+    const newId = `EMP${String(Date.now()).slice(-6)}`;
     const newEmployee = { ...employee, id: newId };
     employees.push(newEmployee);
     saveEmployees(employees);

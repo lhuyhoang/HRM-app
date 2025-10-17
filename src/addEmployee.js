@@ -1,10 +1,17 @@
 import * as db from './employeeDb.js';
 import * as deptDb from './department.js';
 import * as posDb from './position.js';
-import { showAlert } from './uiHelpers';
+import { showAlert } from './uiHelpers.js';
 export const render = (container) => {
-    const departments = depDb.getAllDepartments();
+    const departments = deptDb.getAllDepartments();
     const positions = posDb.getAllPositions();
+    if (departments.length === 0 || positions.length === 0) {
+        container.innerHTML = `
+            <h2>Thêm Nhân viên Mới</h2>
+            <p>Vui lòng tạo phòng ban và vị trí trước khi thêm nhân viên.</p>
+        `;
+        return;
+    }
     const deptOptions = departments.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
     const posOptions = positions.map(p => `<option value="${p.id}">${p.title}</option>`).join('');
     container.innerHTML = `
@@ -33,19 +40,19 @@ export const render = (container) => {
             <button type="submit">Thêm Nhân viên</button>
         </form>
     `;
-    const form = document.getElementById('add-employee-form');
-    form.addEventListener('sumit', (e) => {
+    const form = container.querySelector('#add-employee-form');
+    form.addEventListener('submit', (e) => {
         e.preventDefault();
         const newEmployee = {
-            name: document.getElementById('name').value,
-            departmentId: parseInt(document.getElementById('department').value),
-            positionId: parseInt(document.getElementById('position').value),
-            salary: parseFloat(document.getElementById('salary').value),
-            hireDate: document.getElementById('hireDate').value,
+            name: container.querySelector('#name').value.trim(),
+            departmentId: Number(container.querySelector('#department').value),
+            positionId: Number(container.querySelector('#position').value),
+            salary: Number.parseFloat(container.querySelector('#salary').value),
+            hireDate: container.querySelector('#hireDate').value,
             bonus: 0,
             deduction: 0
         };
-        if (!newEmployee.name || newEmployee.salary <= 0) {
+        if (!newEmployee.name || Number.isNaN(newEmployee.salary) || newEmployee.salary <= 0) {
             showAlert('Dữ liệu không hợp lệ', 'error');
             return;
         }
