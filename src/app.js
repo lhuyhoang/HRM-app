@@ -5,20 +5,15 @@ import * as AddEmployee from './addEmployee.js';
 import * as SearchEmployee from './searchEmployee.js';
 import * as Department from './department.js';
 import * as Position from './position.js';
-
+import * as Salary from './salary.js';
+import * as Attendance from './attendance.js';
+import * as Leaves from './leaves.js';
+import * as Performance from './performance.js';
 const authContainer = document.getElementById('auth-container');
 const mainDashboard = document.getElementById('main-dashboard');
 const sidebar = document.getElementById('sidebar');
 const logoutBtn = document.getElementById('logout-btn');
 const appContent = document.getElementById('app-content');
-
-const renderSalary = (container) => {
-    container.innerHTML = `
-        <h2>Bảng lương</h2>
-        <p>Tính năng này đang được phát triển.</p>
-    `;
-};
-
 const routes = {
     'addEmployee': AddEmployee.render,
     'searchEmployee': SearchEmployee.render,
@@ -31,7 +26,10 @@ const routes = {
         `;
     },
     'positions': Position.render,
-    'salary': renderSalary,
+    'salary': Salary.render,
+    'attendance': Attendance.render,
+    'leaves': Leaves.render,
+    'performance': Performance.render,
 };
 const navigateTo = (moduleName) => {
     const renderFunction = routes[moduleName];
@@ -55,11 +53,13 @@ const handleLogout = () => {
     Auth.logout();
     showLogin();
 };
-
 const initializeApp = () => {
     EmployeeDB.init();
     DeptDB.init();
     Position.init();
+    Attendance.init();
+    Leaves.init();
+    Performance.init();
     if (Auth.isAuthenticated()) {
         showDashboard();
     } else {
