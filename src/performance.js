@@ -1,4 +1,6 @@
 import * as EmployeeDB from './employeeDb.js';
+import * as DeptDB from './department.js';
+import * as PositionDB from './position.js';
 import { createTable, showAlert, showConfirm } from './uiHelpers.js';
 const STORAGE_KEY = 'hrm_performance_reviews';
 const readReviews = () => {
@@ -52,8 +54,9 @@ export const render = (container) => {
         `;
         return;
     }
-    const employeeOptions = employees
-        .map((emp) => `<option value="${emp.id}">${emp.name} (${emp.id})</option>`)
+    const departments = DeptDB.getAllDepartments();
+    const deptOptions = departments
+        .map((dept) => `<option value="${dept.id}">${dept.name}</option>`)
         .join('');
     const ratingOptions = RATINGS
         .map((item) => `<option value="${item.value}">${item.label}</option>`)
@@ -61,10 +64,18 @@ export const render = (container) => {
     container.innerHTML = `
         <h2>Đánh giá hiệu suất</h2>
         <form id="performance-form" class="form-group">
+            <label for="performance-department">Phòng ban</label>
+            <select id="performance-department" required>
+                <option value="">-- Chọn phòng ban --</option>
+                ${deptOptions}
+            </select>
+            <label for="performance-position">Vị trí</label>
+            <select id="performance-position" required disabled>
+                <option value="">-- Chọn vị trí --</option>
+            </select>
             <label for="performance-employee">Nhân viên</label>
-            <select id="performance-employee" required>
+            <select id="performance-employee" required disabled>
                 <option value="">-- Chọn nhân viên --</option>
-                ${employeeOptions}
             </select>
             <label for="performance-period">Kỳ đánh giá</label>
             <input type="month" id="performance-period" required>
@@ -80,6 +91,44 @@ export const render = (container) => {
     `;
     const form = container.querySelector('#performance-form');
     const tableWrapper = container.querySelector('#performance-table');
+    const deptSelect = form.querySelector('#performance-department');
+    const positionSelect = form.querySelector('#performance-position');
+    const employeeSelect = form.querySelector('#performance-employee');
+    const resetSelect = (selectEl, placeholder, disabled = true) => {
+        selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+        selectEl.disabled = disabled;
+    };
+    const populatePositions = (departmentId) => {
+        const positions = PositionDB.getPositionsByDepartment(departmentId);
+        const options = positions.map((pos) => `<option value="${pos.id}">${pos.title}</option>`).join('');
+        positionSelect.innerHTML = `<option value="">-- Chọn vị trí --</option>${options}`;
+        positionSelect.disabled = positions.length === 0;
+    };
+    const populateEmployees = (departmentId, positionId) => {
+        const filtered = EmployeeDB.getAllEmployees().filter(
+            (emp) => emp.departmentId === departmentId && emp.positionId === positionId
+        );
+        const options = filtered.map((emp) => `<option value="${emp.id}">${emp.name} (${emp.id})</option>`).join('');
+        employeeSelect.innerHTML = `<option value="">-- Chọn nhân viên --</option>${options}`;
+        employeeSelect.disabled = filtered.length === 0;
+    };
+    resetSelect(positionSelect, '-- Chọn vị trí --', true);
+    resetSelect(employeeSelect, '-- Chọn nhân viên --', true);
+
+    deptSelect.addEventListener('change', () => {
+        const deptVal = deptSelect.value;
+        resetSelect(positionSelect, '-- Chọn vị trí --', true);
+        resetSelect(employeeSelect, '-- Chọn nhân viên --', true);
+        if (!deptVal) return;
+        populatePositions(Number(deptVal));
+    });
+    positionSelect.addEventListener('change', () => {
+        const deptVal = deptSelect.value;
+        const posVal = positionSelect.value;
+        resetSelect(employeeSelect, '-- Chọn nhân viên --', true);
+        if (!deptVal || !posVal) return;
+        populateEmployees(Number(deptVal), Number(posVal));
+    });
     const renderTable = () => {
         const reviews = getAllReviews();
         const currentEmployees = EmployeeDB.getAllEmployees();
@@ -108,16 +157,26 @@ export const render = (container) => {
     };
     form.addEventListener('submit', (event) => {
         event.preventDefault();
-        const employeeId = form.querySelector('#performance-employee').value;
+        const deptVal = deptSelect.value;
+        const posVal = positionSelect.value;
+        const employeeId = employeeSelect.value;
         const period = form.querySelector('#performance-period').value;
         const rating = form.querySelector('#performance-rating').value;
         const comments = form.querySelector('#performance-comments').value.trim();
-        if (!employeeId || !period || !rating) {
-            showAlert('Vui lòng điền đầy đủ thông tin', 'error');
+        if (!deptVal || !posVal || !employeeId || !period || !rating) {
+            showAlert('Vui lòng chọn phòng ban, vị trí, nhân viên và điền đầy đủ thông tin', 'error');
+            return;
+        }
+        const emp = EmployeeDB.getEmployeeById(employeeId);
+        if (!emp || emp.departmentId !== Number(deptVal) || emp.positionId !== Number(posVal)) {
+            showAlert('Nhân viên không thuộc phòng ban/ vị trí đã chọn', 'error');
             return;
         }
         addReview({ employeeId, period, rating, comments });
         form.reset();
+        deptSelect.value = '';
+        resetSelect(positionSelect, '-- Chọn vị trí --', true);
+        resetSelect(employeeSelect, '-- Chọn nhân viên --', true);
         showAlert('Đã lưu đánh giá');
         renderTable();
     });
