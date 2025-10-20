@@ -1,4 +1,5 @@
 import * as Auth from './auth.js';
+import * as Register from './register.js';
 import * as EmployeeDB from './employeeDb.js';
 import * as DeptDB from './department.js';
 import * as AddEmployee from './addEmployee.js';
@@ -32,6 +33,10 @@ const routes = {
     'performance': Performance.render,
 };
 const navigateTo = (moduleName) => {
+    if (!Auth.isAuthenticated()) {
+        showLogin();
+        return;
+    }
     const renderFunction = routes[moduleName];
     if (renderFunction) {
         renderFunction(appContent);
@@ -47,7 +52,12 @@ const showDashboard = () => {
 const showLogin = () => {
     mainDashboard.classList.add('hidden');
     authContainer.classList.remove('hidden');
-    Auth.renderLogin(authContainer, showDashboard);
+    Auth.renderLogin(authContainer, showDashboard, showRegister);
+};
+const showRegister = () => {
+    mainDashboard.classList.add('hidden');
+    authContainer.classList.remove('hidden');
+    Register.render(authContainer, showLogin);
 };
 const handleLogout = () => {
     Auth.logout();
@@ -69,6 +79,10 @@ const initializeApp = () => {
 sidebar.addEventListener('click', (e) => {
     e.preventDefault();
     if (e.target.tagName === 'A' && e.target.dataset.module) {
+        if (!Auth.isAuthenticated()) {
+            showLogin();
+            return;
+        }
         const moduleName = e.target.dataset.module;
         navigateTo(moduleName);
     }
