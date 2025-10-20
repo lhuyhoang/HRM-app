@@ -126,6 +126,7 @@ body {
     background: var(--primary-color);
     color: #fff;
 }
+
 #app-container {
     display: flex;
     justify-content: center;
