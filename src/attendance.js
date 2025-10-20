@@ -1,4 +1,6 @@
 import * as EmployeeDB from './employeeDb.js';
+import * as DeptDB from './department.js';
+import * as PositionDB from './position.js';
 import { createTable, showAlert, showConfirm } from './uiHelpers.js';
 const STORAGE_KEY = 'hrm_attendance_records';
 const readRecords = () => {
@@ -52,8 +54,9 @@ export const render = (container) => {
         `;
         return;
     }
-    const employeeOptions = employees
-        .map((emp) => `<option value="${emp.id}">${emp.name} (${emp.id})</option>`)
+    const departments = DeptDB.getAllDepartments();
+    const deptOptions = departments
+        .map((dept) => `<option value="${dept.id}">${dept.name}</option>`)
         .join('');
     const statusOptions = ATTENDANCE_STATUSES
         .map((status) => `<option value="${status.value}">${status.label}</option>`)
@@ -61,10 +64,18 @@ export const render = (container) => {
     container.innerHTML = `
         <h2>Chấm công</h2>
         <form id="attendance-form" class="form-group">
+            <label for="attendance-department">Phòng ban</label>
+            <select id="attendance-department" required>
+                <option value="">-- Chọn phòng ban --</option>
+                ${deptOptions}
+            </select>
+            <label for="attendance-position">Vị trí</label>
+            <select id="attendance-position" required disabled>
+                <option value="">-- Chọn vị trí --</option>
+            </select>
             <label for="attendance-employee">Nhân viên</label>
-            <select id="attendance-employee" required>
+            <select id="attendance-employee" required disabled>
                 <option value="">-- Chọn nhân viên --</option>
-                ${employeeOptions}
             </select>
             <label for="attendance-date">Ngày</label>
             <input type="date" id="attendance-date" required>
@@ -80,6 +91,54 @@ export const render = (container) => {
     `;
     const form = container.querySelector('#attendance-form');
     const tableWrapper = container.querySelector('#attendance-table');
+    const dateInput = form.querySelector('#attendance-date');
+    const deptSelect = form.querySelector('#attendance-department');
+    const positionSelect = form.querySelector('#attendance-position');
+    const employeeSelect = form.querySelector('#attendance-employee');
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+    dateInput.setAttribute('max', todayStr);
+    if (!dateInput.value) {
+        dateInput.value = todayStr;
+    }
+    const resetSelect = (selectEl, placeholder, disabled = true) => {
+        selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+        selectEl.disabled = disabled;
+    };
+    const populatePositions = (departmentId) => {
+        const positions = PositionDB.getPositionsByDepartment(departmentId);
+        const options = positions.map((pos) => `<option value="${pos.id}">${pos.title}</option>`).join('');
+        positionSelect.innerHTML = `<option value="">-- Chọn vị trí --</option>${options}`;
+        positionSelect.disabled = positions.length === 0;
+    };
+    const populateEmployees = (departmentId, positionId) => {
+        const filtered = EmployeeDB.getAllEmployees().filter(
+            (emp) => emp.departmentId === departmentId && emp.positionId === positionId
+        );
+        const options = filtered.map((emp) => `<option value="${emp.id}">${emp.name} (${emp.id})</option>`).join('');
+        employeeSelect.innerHTML = `<option value="">-- Chọn nhân viên --</option>${options}`;
+        employeeSelect.disabled = filtered.length === 0;
+    };
+    resetSelect(positionSelect, '-- Chọn vị trí --', true);
+    resetSelect(employeeSelect, '-- Chọn nhân viên --', true);
+
+    deptSelect.addEventListener('change', () => {
+        const deptVal = deptSelect.value;
+        resetSelect(positionSelect, '-- Chọn vị trí --', true);
+        resetSelect(employeeSelect, '-- Chọn nhân viên --', true);
+        if (!deptVal) return;
+        populatePositions(Number(deptVal));
+    });
+    positionSelect.addEventListener('change', () => {
+        const deptVal = deptSelect.value;
+        const posVal = positionSelect.value;
+        resetSelect(employeeSelect, '-- Chọn nhân viên --', true);
+        if (!deptVal || !posVal) return;
+        populateEmployees(Number(deptVal), Number(posVal));
+    });
     const renderTable = () => {
         const records = getAllRecords();
         const currentEmployees = EmployeeDB.getAllEmployees();
@@ -108,16 +167,32 @@ export const render = (container) => {
     };
     form.addEventListener('submit', (event) => {
         event.preventDefault();
-        const employeeId = form.querySelector('#attendance-employee').value;
+        const deptVal = deptSelect.value;
+        const posVal = positionSelect.value;
+        const employeeId = employeeSelect.value;
         const date = form.querySelector('#attendance-date').value;
         const status = form.querySelector('#attendance-status').value;
         const note = form.querySelector('#attendance-note').value.trim();
-        if (!employeeId || !date || !status) {
-            showAlert('Vui lòng điền đầy đủ thông tin', 'error');
+        if (!deptVal || !posVal || !employeeId || !date || !status) {
+            showAlert('Vui lòng chọn phòng ban, vị trí và nhân viên, cũng như điền đủ thông tin', 'error');
+            return;
+        }
+        const emp = EmployeeDB.getEmployeeById(employeeId);
+        if (!emp || emp.departmentId !== Number(deptVal) || emp.positionId !== Number(posVal)) {
+            showAlert('Nhân viên không thuộc phòng ban/ vị trí đã chọn', 'error');
+            return;
+        }
+        if (date > todayStr) {
+            showAlert('Ngày chấm công chỉ được là hôm nay hoặc ngày trong quá khứ', 'error');
             return;
         }
         addRecord({ employeeId, date, status, note });
         form.reset();
+        dateInput.setAttribute('max', todayStr);
+        dateInput.value = todayStr;
+        deptSelect.value = '';
+        resetSelect(positionSelect, '-- Chọn vị trí --', true);
+        resetSelect(employeeSelect, '-- Chọn nhân viên --', true);
         showAlert('Đã lưu chấm công');
         renderTable();
     });
