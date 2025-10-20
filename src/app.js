@@ -21,9 +21,20 @@ const routes = {
     'department': Department.render,
     'departments': Department.render,
     'dashboard': (container) => {
+        const deptCount = DeptDB.getAllDepartments().length;
+        const empCount = EmployeeDB.getAllEmployees().length;
         container.innerHTML = `
             <h2>Chào mừng đến với Hệ thống HRM!</h2>
-            <p>Chọn một chức năng từ menu bên trái để bắt đầu.</p>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Phòng ban</div>
+                    <div class="stat-value">${deptCount}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Nhân viên</div>
+                    <div class="stat-value">${empCount}</div>
+                </div>
+            </div>
         `;
     },
     'positions': Position.render,
