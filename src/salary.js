@@ -1,4 +1,5 @@
 import * as EmployeeDB from './employeeDb.js';
+import * as DeptDB from './department.js';
 import { createTable, showAlert } from './uiHelpers.js';
 export const render = (container) => {
     const employees = EmployeeDB.getAllEmployees();
@@ -10,14 +11,36 @@ export const render = (container) => {
         `;
         return;
     }
+    const departments = DeptDB.getAllDepartments();
+    const deptOptions = [`<option value="">-- Tất cả phòng ban --</option>`]
+        .concat(departments.map((d) => `<option value="${d.id}">${d.name}</option>`))
+        .join('');
     container.innerHTML = `
         <h2>Bảng lương</h2>
         <p>Cập nhật thưởng và khấu trừ cho từng nhân viên để tính lương thực lĩnh.</p>
+        <div class="form-group">
+            <label for="salary-department-filter">Lọc theo phòng ban</label>
+            <select id="salary-department-filter">
+                ${deptOptions}
+            </select>
+        </div>
         <div id="salary-table"></div>
     `;
     const tableWrapper = container.querySelector('#salary-table');
+    const deptFilter = container.querySelector('#salary-department-filter');
+    let selectedDeptId = '';
+    const getFilteredEmployees = () => {
+        const latest = EmployeeDB.getAllEmployees();
+        if (!selectedDeptId) return latest;
+        const deptIdNum = Number(selectedDeptId);
+        return latest.filter((emp) => emp.departmentId === deptIdNum);
+    };
     const renderTable = () => {
-        const latestEmployees = EmployeeDB.getAllEmployees();
+        const latestEmployees = getFilteredEmployees();
+        if (latestEmployees.length === 0) {
+            tableWrapper.innerHTML = '<p>Không có nhân viên thuộc phòng ban đã chọn.</p>';
+            return;
+        }
         const tableHtml = createTable(
             ['ID', 'Tên', 'Lương cơ bản', 'Thưởng', 'Khấu trừ', 'Thực lĩnh', 'Hành động'],
             latestEmployees,
@@ -41,6 +64,10 @@ export const render = (container) => {
         );
         tableWrapper.innerHTML = tableHtml;
     };
+    deptFilter.addEventListener('change', () => {
+        selectedDeptId = deptFilter.value;
+        renderTable();
+    });
     tableWrapper.addEventListener('click', (event) => {
         const button = event.target.closest('button[data-action="save"]');
         if (!button) {
