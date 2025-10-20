@@ -1,7 +1,7 @@
 import { showAlert } from './uiHelpers.js';
 const USERS_KEY = 'hrm_users';
 const SESSION_KEY = 'hrm_session';
-const SESSION_TTL_MS = 60 * 60 * 1000; // 1 hour
+const SESSION_TTL_MS = 60 * 60 * 1000;
 const simpleHash = (password) => {
     return `hashed_${password}_secret`;
 };
