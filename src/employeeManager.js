@@ -41,51 +41,6 @@ export const render = (container) => {
                 <button id="mgr-show-add" class="secondary">+ Thêm nhân viên</button>
             </div>
         </div>
-
-        <div id="mgr-add" class="hidden">
-            <div class="form-container">
-                <h3>Thêm nhân viên</h3>
-                <form id="mgr-add-form">
-                    <div class="form-group">
-                        <label for="add-name">Họ và Tên</label>
-                        <input type="text" id="add-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="add-phone">Số điện thoại</label>
-                        <input type="tel" id="add-phone" placeholder="0901234567" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="add-email">Email</label>
-                        <input type="email" id="add-email" placeholder="name@example.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="add-dept">Phòng ban</label>
-                        <select id="add-dept" required>
-                            <option value="">-- Chọn phòng ban --</option>
-                            ${deptOptions}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="add-pos">Vị trí</label>
-                        <select id="add-pos" required disabled>
-                            <option value="">-- Chọn vị trí --</option>
-                        </select>
-                        <small id="add-pos-hint" style="display:block;color:#6c757d;margin-top:4px;"></small>
-                    </div>
-                    <div class="form-group">
-                        <label for="add-salary">Lương ($)</label>
-                        <input type="number" id="add-salary" min="0" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="add-hire">Ngày vào làm</label>
-                        <input type="date" id="add-hire" required>
-                    </div>
-                    <button type="submit">Lưu</button>
-                    <button type="button" id="mgr-cancel-add" class="secondary">Hủy</button>
-                </form>
-            </div>
-        </div>
-
         <div id="mgr-edit"></div>
         <div id="mgr-results"></div>
     `;
@@ -95,11 +50,6 @@ export const render = (container) => {
     const queryInput = container.querySelector('#mgr-q');
     const fieldSelect = container.querySelector('#mgr-field');
     const addToggleBtn = container.querySelector('#mgr-show-add');
-    const addPanel = container.querySelector('#mgr-add');
-    const addForm = container.querySelector('#mgr-add-form');
-    const addDept = container.querySelector('#add-dept');
-    const addPos = container.querySelector('#add-pos');
-    const addPosHint = container.querySelector('#add-pos-hint');
     const editContainer = container.querySelector('#mgr-edit');
     const resultsContainer = container.querySelector('#mgr-results');
     const resetPos = (selectEl, placeholder = '-- Tất cả vị trí --', disabled = true) => {
@@ -124,28 +74,139 @@ export const render = (container) => {
         if (!val) return;
         fillPositions(posSelect, Number(val));
     });
-    const resetAddPos = () => {
-        resetPos(addPos, '-- Chọn vị trí --', true);
-        if (addPosHint) addPosHint.textContent = '';
-    };
-    resetAddPos();
-    addDept.addEventListener('change', () => {
-        const val = addDept.value;
-        resetAddPos();
-        if (!val) return;
-        const ok = fillPositions(addPos, Number(val), '-- Chọn vị trí --');
-        if (!ok && addPosHint) {
-            addPosHint.textContent = 'Phòng ban này chưa có vị trí. Vui lòng tạo vị trí trước.';
+    const openAddModal = () => {
+        let modal = document.getElementById('mgr-add-modal');
+        if (modal) {
+            modal.style.display = 'block';
+            return;
         }
-    });
-    addToggleBtn.addEventListener('click', () => {
-        addPanel.classList.toggle('hidden');
-    });
-    container.querySelector('#mgr-cancel-add').addEventListener('click', () => {
-        addForm.reset();
-        resetAddPos();
-        addPanel.classList.add('hidden');
-    });
+        modal = document.createElement('div');
+        modal.id = 'mgr-add-modal';
+        modal.style.cssText = [
+            'position:fixed', 'top:20%', 'left:50%', 'transform:translate(-50%, -20%)',
+            'width:420px', 'max-width:90vw', 'background:#fff', 'border:1px solid #ddd', 'border-radius:8px',
+            'box-shadow:0 10px 30px rgba(0,0,0,.2)', 'z-index:9999'
+        ].join(';');
+        modal.innerHTML = `
+            <div id="mgr-add-modal-header" style="cursor:move; padding:.6rem .8rem; background:#0d6efd; color:#fff; border-top-left-radius:8px; border-top-right-radius:8px; display:flex; align-items:center; justify-content:space-between;">
+                <strong>Thêm nhân viên</strong>
+                <button id="mgr-add-close" style="background:transparent;border:none;color:#fff;font-size:18px;line-height:1;cursor:pointer">✕</button>
+            </div>
+            <div style="padding:1rem;">
+                <form id="mgr-add-form-modal">
+                    <div class="form-group">
+                        <label for="madd-name">Họ và Tên</label>
+                        <input type="text" id="madd-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="madd-phone">Số điện thoại</label>
+                        <input type="tel" id="madd-phone" placeholder="0901234567" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="madd-email">Email</label>
+                        <input type="email" id="madd-email" placeholder="name@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="madd-dept">Phòng ban</label>
+                        <select id="madd-dept" required>
+                            <option value="">-- Chọn phòng ban --</option>
+                            ${deptOptions}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="madd-pos">Vị trí</label>
+                        <select id="madd-pos" required disabled>
+                            <option value="">-- Chọn vị trí --</option>
+                        </select>
+                        <small id="madd-pos-hint" style="display:block;color:#6c757d;margin-top:4px;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="madd-salary">Lương ($)</label>
+                        <input type="number" id="madd-salary" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="madd-hire">Ngày vào làm</label>
+                        <input type="date" id="madd-hire" required>
+                    </div>
+                    <div style="display:flex; gap:.5rem; justify-content:flex-end; margin-top:.5rem;">
+                        <button type="button" id="madd-cancel" class="secondary">Hủy</button>
+                        <button type="submit">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        const header = document.getElementById('mgr-add-modal-header');
+        let isDragging = false; let startX = 0; let startY = 0; let startLeft = 0; let startTop = 0;
+        const toPx = (v) => Number(String(v).replace('px', '')) || 0;
+        const onMouseDown = (e) => {
+            isDragging = true;
+            modal.style.transform = 'none';
+            startX = e.clientX; startY = e.clientY;
+            if (!modal.style.left) modal.style.left = '50%';
+            if (!modal.style.top) modal.style.top = '20%';
+            startLeft = modal.offsetLeft; startTop = modal.offsetTop;
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        };
+        const onMouseMove = (e) => {
+            if (!isDragging) return;
+            const dx = e.clientX - startX; const dy = e.clientY - startY;
+            let newLeft = startLeft + dx; let newTop = startTop + dy;
+            const vw = window.innerWidth; const vh = window.innerHeight;
+            const rect = modal.getBoundingClientRect();
+            const maxLeft = vw - rect.width; const maxTop = vh - rect.height;
+            newLeft = Math.max(0, Math.min(newLeft, Math.max(0, maxLeft)));
+            newTop = Math.max(0, Math.min(newTop, Math.max(0, maxTop)));
+            modal.style.left = newLeft + 'px';
+            modal.style.top = newTop + 'px';
+        };
+        const onMouseUp = () => {
+            isDragging = false;
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        };
+        header.addEventListener('mousedown', onMouseDown);
+        const mDept = document.getElementById('madd-dept');
+        const mPos = document.getElementById('madd-pos');
+        const mPosHint = document.getElementById('madd-pos-hint');
+        const resetModalPos = () => { resetPos(mPos, '-- Chọn vị trí --', true); if (mPosHint) mPosHint.textContent = ''; };
+        resetModalPos();
+        mDept.addEventListener('change', () => {
+            resetModalPos();
+            if (!mDept.value) return;
+            const ok = fillPositions(mPos, Number(mDept.value), '-- Chọn vị trí --');
+            if (!ok && mPosHint) mPosHint.textContent = 'Phòng ban này chưa có vị trí. Vui lòng tạo vị trí trước.';
+        });
+        // Close & cancel
+        const close = () => { modal.style.display = 'none'; };
+        document.getElementById('mgr-add-close').addEventListener('click', close);
+        document.getElementById('madd-cancel').addEventListener('click', close);
+        // Submit add form
+        const mForm = document.getElementById('mgr-add-form-modal');
+        mForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = (document.getElementById('madd-name').value || '').trim();
+            const phone = (document.getElementById('madd-phone').value || '').trim();
+            const email = (document.getElementById('madd-email').value || '').trim();
+            const departmentId = Number((document.getElementById('madd-dept')).value);
+            const positionId = Number((document.getElementById('madd-pos')).value);
+            const salary = Number.parseFloat((document.getElementById('madd-salary')).value);
+            const hireDate = (document.getElementById('madd-hire')).value;
+            const phonePattern = /^[0-9+()\-\s]{9,20}$/;
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!name || Number.isNaN(salary) || salary <= 0) { showAlert('Dữ liệu không hợp lệ', 'error'); return; }
+            if (!phone || !phonePattern.test(phone)) { showAlert('Số điện thoại không hợp lệ', 'error'); return; }
+            if (!email || !emailPattern.test(email)) { showAlert('Email không hợp lệ', 'error'); return; }
+            if (!departmentId) { showAlert('Vui lòng chọn phòng ban', 'error'); return; }
+            if (!positionId) { showAlert('Vui lòng chọn vị trí', 'error'); return; }
+            EmployeeDB.addEmployee({ name, phone, email, departmentId, positionId, salary, hireDate, bonus: 0, deduction: 0 });
+            showAlert('Thêm nhân viên thành công');
+            close();
+            renderTable();
+        });
+    };
+    addToggleBtn.addEventListener('click', openAddModal);
     const getFilteredEmployees = () => {
         const all = EmployeeDB.getAllEmployees();
         const deptVal = deptSelect.value;
@@ -201,39 +262,6 @@ export const render = (container) => {
     queryInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') renderTable(); });
     deptSelect.addEventListener('change', renderTable);
     posSelect.addEventListener('change', renderTable);
-    addForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const name = container.querySelector('#add-name').value.trim();
-        const phone = container.querySelector('#add-phone').value.trim();
-        const email = container.querySelector('#add-email').value.trim();
-        const departmentId = Number(addDept.value);
-        const positionId = Number(addPos.value);
-        const salary = Number.parseFloat(container.querySelector('#add-salary').value);
-        const hireDate = container.querySelector('#add-hire').value;
-        const phonePattern = /^[0-9+()\-\s]{9,20}$/;
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!name || Number.isNaN(salary) || salary <= 0) {
-            showAlert('Dữ liệu không hợp lệ', 'error');
-            return;
-        }
-        if (!phone || !phonePattern.test(phone)) {
-            showAlert('Số điện thoại không hợp lệ', 'error');
-            return;
-        }
-        if (!email || !emailPattern.test(email)) {
-            showAlert('Email không hợp lệ', 'error');
-            return;
-        }
-        if (!departmentId) { showAlert('Vui lòng chọn phòng ban', 'error'); return; }
-        if (!positionId) { showAlert('Vui lòng chọn vị trí', 'error'); return; }
-
-        EmployeeDB.addEmployee({ name, phone, email, departmentId, positionId, salary, hireDate, bonus: 0, deduction: 0 });
-        showAlert('Thêm nhân viên thành công');
-        addForm.reset();
-        resetAddPos();
-        addPanel.classList.add('hidden');
-        renderTable();
-    });
     resultsContainer.addEventListener('click', async (e) => {
         const btn = e.target.closest('button');
         if (!btn) return;
