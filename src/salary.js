@@ -42,17 +42,21 @@ export const render = (container) => {
             return;
         }
         const tableHtml = createTable(
-            ['ID', 'Tên', 'Lương cơ bản', 'Thưởng', 'Khấu trừ', 'Thực lĩnh', 'Hành động'],
+            ['ID', 'Tên', 'Số điện thoại', 'Email', 'Lương cơ bản', 'Thưởng', 'Khấu trừ', 'Thực lĩnh', 'Hành động'],
             latestEmployees,
             (emp) => {
                 const baseSalary = Number(emp.salary) || 0;
                 const bonus = Number(emp.bonus) || 0;
                 const deduction = Number(emp.deduction) || 0;
                 const netSalary = baseSalary + bonus - deduction;
+                const phone = emp.phone || '';
+                const email = emp.email || '';
                 return `
                     <tr>
                         <td>${emp.id}</td>
                         <td>${emp.name}</td>
+                        <td>${phone}</td>
+                        <td>${email}</td>
                         <td>${baseSalary.toLocaleString()}</td>
                         <td><input type="number" class="bonus-input" data-id="${emp.id}" value="${bonus}" min="0"></td>
                         <td><input type="number" class="deduction-input" data-id="${emp.id}" value="${deduction}" min="0"></td>

@@ -137,14 +137,18 @@ export const render = (container) => {
             return;
         }
         const tableHtml = createTable(
-            ['Nhân viên', 'Kỳ đánh giá', 'Xếp loại', 'Nhận xét', 'Hành động'],
+            ['Nhân viên', 'Số điện thoại', 'Email', 'Kỳ đánh giá', 'Xếp loại', 'Nhận xét', 'Hành động'],
             reviews,
             (review) => {
                 const employee = currentEmployees.find((emp) => emp.id === review.employeeId);
                 const ratingLabel = RATINGS.find((item) => item.value === review.rating)?.label || review.rating;
+                const phone = employee?.phone || '';
+                const email = employee?.email || '';
                 return `
                     <tr>
                         <td>${employee ? employee.name : 'N/A'} (${review.employeeId})</td>
+                        <td>${phone}</td>
+                        <td>${email}</td>
                         <td>${review.period}</td>
                         <td>${ratingLabel}</td>
                         <td>${review.comments || ''}</td>

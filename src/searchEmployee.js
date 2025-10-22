@@ -39,16 +39,21 @@ export const render = (container) => {
             return;
         }
         const table = createTable(
-            ['ID', 'Tên', 'Phòng ban', 'Lương', 'Hành động'],
+            ['ID', 'Tên', 'Số điện thoại', 'Email', 'Phòng ban', 'Lương', 'Hành động'],
             employees,
             (emp) => {
                 const department = deptDb.getAllDepartments().find(d => d.id === emp.departmentId);
+                const phone = emp.phone || '';
+                const email = emp.email || '';
+                const salary = Number(emp.salary) || 0;
                 return `
                     <tr>
                         <td>${emp.id}</td>
                         <td>${emp.name}</td>
+                        <td>${phone}</td>
+                        <td>${email}</td>
                         <td>${department ? department.name : 'N/A'}</td>
-                        <td>$${emp.salary.toLocaleString()}</td>
+                        <td>$${salary.toLocaleString()}</td>
                         <td>
                             <button class="edit-btn" data-id="${emp.id}">Sửa</button>
                             <button class="danger delete-btn" data-id="${emp.id}">Xóa</button>

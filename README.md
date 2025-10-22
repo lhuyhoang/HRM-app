@@ -1,10 +1,6 @@
 # HRM-app
-
-<<<<<<< HEAD
-Ứng dụng quản lý nhân sự (HRM) chạy trực tiếp trên trình duyệt, lưu dữ liệu bằng LocalStorage. Không cần server hay cài đặt thêm.
-=======
+=====================================
 Ứng dụng quản lý nhân sự (HRM) chạy trực tiếp trên trình duyệt, lưu dữ liệu bằng LocalStorage. Không cần server.
->>>>>>> 507f28d1e3b6bcd060aa7f2c1e84911077e55e65
 
 ## Tính năng chính
 - Đăng nhập/Đăng ký, quản lý phiên (session) với thời hạn hết hạn tự động.
@@ -74,15 +70,3 @@ src/
 - Hiệu suất (`Performance`):
   - Chọn theo chuỗi Phòng ban → Vị trí → Nhân viên.
   - Lưu đánh giá theo kỳ (input dạng tháng), xếp loại và nhận xét.
-<<<<<<< HEAD
-
-## Lưu ý dữ liệu & giới hạn
-- Ứng dụng lưu dữ liệu trong LocalStorage của trình duyệt theo các khóa:
-  - `hrm_users`, `hrm_session`
-  - `hrm_departments`, `hrm_positions`, `hrm_employees`
-  - `hrm_attendance_records`, `hrm_leave_requests`, `hrm_performance_reviews`
-- Dữ liệu là cục bộ cho trình duyệt/máy bạn; xóa cache hoặc dùng trình duyệt khác sẽ không còn dữ liệu.
-- ID phòng ban/vị trí tạo bằng `Date.now()` (đơn giản, phù hợp demo).
-- Màn Chấm công giới hạn ngày không vượt quá hôm nay; Nghỉ phép cho phép chọn tương lai (nhưng ngày kết thúc phải ≥ ngày bắt đầu).
-=======
->>>>>>> 507f28d1e3b6bcd060aa7f2c1e84911077e55e65

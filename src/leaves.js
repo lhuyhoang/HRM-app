@@ -140,14 +140,18 @@ export const render = (container) => {
             return;
         }
         const tableHtml = createTable(
-            ['Nhân viên', 'Thời gian', 'Lý do', 'Trạng thái', 'Hành động'],
+            ['Nhân viên', 'Số điện thoại', 'Email', 'Thời gian', 'Lý do', 'Trạng thái', 'Hành động'],
             requests,
             (request) => {
                 const employee = currentEmployees.find((emp) => emp.id === request.employeeId);
                 const statusLabel = STATUS_LABELS[request.status] || request.status;
+                const phone = employee?.phone || '';
+                const email = employee?.email || '';
                 return `
                     <tr>
                         <td>${employee ? employee.name : 'N/A'} (${request.employeeId})</td>
+                        <td>${phone}</td>
+                        <td>${email}</td>
                         <td>${request.startDate} → ${request.endDate}</td>
                         <td>${request.reason}</td>
                         <td>${statusLabel}</td>
