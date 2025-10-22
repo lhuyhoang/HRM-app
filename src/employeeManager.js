@@ -2,15 +2,11 @@ import * as EmployeeDB from './employeeDb.js';
 import * as DeptDB from './department.js';
 import * as PositionDB from './position.js';
 import { createTable, showAlert, showConfirm } from './uiHelpers.js';
-
 export const render = (container) => {
-    // Ensure dependent stores are initialized
     DeptDB.init?.();
     PositionDB.init?.();
-
     const departments = DeptDB.getAllDepartments();
     const deptOptions = departments.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
-
     container.innerHTML = `
         <h2>Quản lý nhân viên</h2>
         <div class="form-container" style="max-width: none; padding: 1rem;">
@@ -93,7 +89,6 @@ export const render = (container) => {
         <div id="mgr-edit"></div>
         <div id="mgr-results"></div>
     `;
-
     const deptSelect = container.querySelector('#mgr-dept');
     const posSelect = container.querySelector('#mgr-pos');
     const searchBtn = container.querySelector('#mgr-search');
@@ -107,8 +102,6 @@ export const render = (container) => {
     const addPosHint = container.querySelector('#add-pos-hint');
     const editContainer = container.querySelector('#mgr-edit');
     const resultsContainer = container.querySelector('#mgr-results');
-
-    // Helpers: populate positions
     const resetPos = (selectEl, placeholder = '-- Tất cả vị trí --', disabled = true) => {
         selectEl.innerHTML = `<option value="">${placeholder}</option>`;
         selectEl.disabled = disabled;
@@ -124,17 +117,13 @@ export const render = (container) => {
         selectEl.disabled = false;
         return true;
     };
-
-    // Top filters cascade
     resetPos(posSelect);
     deptSelect.addEventListener('change', () => {
         const val = deptSelect.value;
         resetPos(posSelect);
-        if (!val) return; // all departments
+        if (!val) return;
         fillPositions(posSelect, Number(val));
     });
-
-    // Add form cascade
     const resetAddPos = () => {
         resetPos(addPos, '-- Chọn vị trí --', true);
         if (addPosHint) addPosHint.textContent = '';
@@ -149,8 +138,6 @@ export const render = (container) => {
             addPosHint.textContent = 'Phòng ban này chưa có vị trí. Vui lòng tạo vị trí trước.';
         }
     });
-
-    // Toggle add panel
     addToggleBtn.addEventListener('click', () => {
         addPanel.classList.toggle('hidden');
     });
@@ -159,8 +146,6 @@ export const render = (container) => {
         resetAddPos();
         addPanel.classList.add('hidden');
     });
-
-    // Search + filter
     const getFilteredEmployees = () => {
         const all = EmployeeDB.getAllEmployees();
         const deptVal = deptSelect.value;
@@ -177,11 +162,9 @@ export const render = (container) => {
             if (field === 'name') return name.includes(q);
             if (field === 'phone') return phone.includes(q);
             if (field === 'email') return email.includes(q);
-            // all
             return name.includes(q) || phone.includes(q) || email.includes(q);
         });
     };
-
     const renderTable = () => {
         const list = getFilteredEmployees();
         if (list.length === 0) {
@@ -214,13 +197,10 @@ export const render = (container) => {
         );
         resultsContainer.innerHTML = table;
     };
-
     searchBtn.addEventListener('click', renderTable);
     queryInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') renderTable(); });
     deptSelect.addEventListener('change', renderTable);
     posSelect.addEventListener('change', renderTable);
-
-    // Add employee submit
     addForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const name = container.querySelector('#add-name').value.trim();
@@ -254,8 +234,6 @@ export const render = (container) => {
         addPanel.classList.add('hidden');
         renderTable();
     });
-
-    // Edit/Delete handlers
     resultsContainer.addEventListener('click', async (e) => {
         const btn = e.target.closest('button');
         if (!btn) return;
@@ -311,7 +289,6 @@ export const render = (container) => {
             const editForm = document.getElementById('mgr-edit-form');
             const editDept = editForm.querySelector('#edit-dept');
             const editPos = editForm.querySelector('#edit-pos');
-            // Cascade positions on edit change
             editDept.addEventListener('change', () => {
                 const val = editDept.value;
                 if (!val) return;
@@ -345,7 +322,5 @@ export const render = (container) => {
             });
         }
     });
-
-    // Initial render
     renderTable();
 };
