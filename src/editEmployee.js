@@ -23,6 +23,14 @@ export const render = (container, employeeId, onUpdateSuccess) => {
                 <input type="text" id="edit-name" value="${employee.name}" required>
             </div>
             <div class="form-group">
+                <label for="edit-phone">Số điện thoại</label>
+                <input type="tel" id="edit-phone" value="${employee.phone || ''}" placeholder="Ví dụ: 0901234567" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-email">Email</label>
+                <input type="email" id="edit-email" value="${employee.email || ''}" placeholder="name@example.com" required>
+            </div>
+            <div class="form-group">
                 <label for="edit-department">Phòng ban</label>
                 <select id="edit-department" required>${deptOptions}</select>
             </div>
@@ -41,15 +49,29 @@ export const render = (container, employeeId, onUpdateSuccess) => {
     const form = container.querySelector('#edit-employee-form');
     form.addEventListener('submit', (e) => {
         e.preventDefault();
+        const phone = form.querySelector('#edit-phone').value.trim();
+        const email = form.querySelector('#edit-email').value.trim();
+        const phonePattern = /^[0-9+()\-\s]{9,20}$/;
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const updatedData = {
             ...employee,
             name: form.querySelector('#edit-name').value.trim(),
+            phone,
+            email,
             departmentId: Number(form.querySelector('#edit-department').value),
             positionId: Number(form.querySelector('#edit-position').value),
             salary: Number.parseFloat(form.querySelector('#edit-salary').value),
         };
         if (!updatedData.name || Number.isNaN(updatedData.salary) || updatedData.salary < 0) {
             showAlert('Dữ liệu cập nhật không hợp lệ', 'error');
+            return;
+        }
+        if (!phone || !phonePattern.test(phone)) {
+            showAlert('Số điện thoại không hợp lệ', 'error');
+            return;
+        }
+        if (!email || !emailPattern.test(email)) {
+            showAlert('Email không hợp lệ', 'error');
             return;
         }
         db.updateEmployee(updatedData);

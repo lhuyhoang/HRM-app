@@ -20,6 +20,14 @@ export const render = (container) => {
                 <input type="text" id="name" required>
             </div>
             <div class="form-group">
+                <label for="phone">Số điện thoại</label>
+                <input type="tel" id="phone" placeholder="" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="name@example.com" required>
+            </div>
+            <div class="form-group">
                 <label for="department">Phòng ban</label>
                 <select id="department" required>
                     <option value="">-- Chọn phòng ban --</option>
@@ -66,8 +74,6 @@ export const render = (container) => {
         posSelect.disabled = false;
         if (posHint) posHint.textContent = '';
     };
-
-    // Initialize positions based on default department selection (if any)
     resetPositions();
     deptSelect.addEventListener('change', () => {
         const val = deptSelect.value;
@@ -79,6 +85,8 @@ export const render = (container) => {
         e.preventDefault();
         const newEmployee = {
             name: container.querySelector('#name').value.trim(),
+            phone: container.querySelector('#phone').value.trim(),
+            email: container.querySelector('#email').value.trim(),
             departmentId: Number(deptSelect.value),
             positionId: Number(posSelect.value),
             salary: Number.parseFloat(container.querySelector('#salary').value),
@@ -86,8 +94,18 @@ export const render = (container) => {
             bonus: 0,
             deduction: 0
         };
+        const phonePattern = /^[0-9+()\-\s]{9,20}$/;
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!newEmployee.name || Number.isNaN(newEmployee.salary) || newEmployee.salary <= 0) {
             showAlert('Dữ liệu không hợp lệ', 'error');
+            return;
+        }
+        if (!newEmployee.phone || !phonePattern.test(newEmployee.phone)) {
+            showAlert('Số điện thoại không hợp lệ', 'error');
+            return;
+        }
+        if (!newEmployee.email || !emailPattern.test(newEmployee.email)) {
+            showAlert('Email không hợp lệ', 'error');
             return;
         }
         if (!deptSelect.value) {
