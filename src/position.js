@@ -86,7 +86,7 @@ export const render = (container) => {
 			</form>
 		`
         }
-		<div id="position-table"></div>
+        <div id="position-table"></div>
 	`;
     const tableWrapper = container.querySelector('#position-table');
     const renderTable = () => {
@@ -108,7 +108,10 @@ export const render = (container) => {
 						<td>${pos.title}</td>
 						<td>${departmentName}</td>
 						<td>${salaryLabel}</td>
-						<td><button class="danger" data-action="delete" data-id="${pos.id}">Xóa</button></td>
+						<td>
+                            <button data-action="edit" data-id="${pos.id}">Sửa</button>
+                            <button class="danger" data-action="delete" data-id="${pos.id}">Xóa</button>
+                        </td>
 					</tr>
 				`;
             }
@@ -150,24 +153,131 @@ export const render = (container) => {
             }
         });
     }
+    const openEditModal = (posId) => {
+        const pos = getPositionById(posId);
+        if (!pos) { showAlert('Không tìm thấy vị trí', 'error'); return; }
+        const depts = DeptDB.getAllDepartments();
+        if (depts.length === 0) { showAlert('Vui lòng tạo phòng ban trước', 'error'); return; }
+
+        let modal = document.getElementById('pos-edit-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'pos-edit-modal';
+            modal.style.cssText = [
+                'position:fixed', 'top:20%', 'left:50%', 'transform:translate(-50%, -20%)',
+                'width:420px', 'max-width:90vw', 'background:#fff', 'border:1px solid #ddd', 'border-radius:8px',
+                'box-shadow:0 10px 30px rgba(0,0,0,.2)', 'z-index:9999'
+            ].join(';');
+            modal.innerHTML = `
+                <div id="pos-edit-header" style="cursor:move; padding:.6rem .8rem; background:#0d6efd; color:#fff; border-top-left-radius:8px; border-top-right-radius:8px; display:flex; align-items:center; justify-content:space-between;">
+                    <strong>Sửa vị trí</strong>
+                    <button id="pos-edit-close" style="background:transparent;border:none;color:#fff;font-size:18px;line-height:1;cursor:pointer">✕</button>
+                </div>
+                <div style="padding:1rem;">
+                    <form id="pos-edit-form">
+                        <div class="form-group">
+                            <label for="editp-title">Tên vị trí</label>
+                            <input type="text" id="editp-title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editp-dept">Phòng ban</label>
+                            <select id="editp-dept" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editp-salary">Lương cơ bản (VND)</label>
+                            <input type="number" id="editp-salary" min="0" step="100000">
+                        </div>
+                        <div style="display:flex; gap:.5rem; justify-content:flex-end; margin-top:.5rem;">
+                            <button type="button" id="pos-edit-cancel" class="secondary">Hủy</button>
+                            <button type="submit">Lưu</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            const header = document.getElementById('pos-edit-header');
+            let isDragging = false; let startX = 0; let startY = 0; let startLeft = 0; let startTop = 0;
+            const onMouseDown = (e) => {
+                isDragging = true;
+                modal.style.transform = 'none';
+                startX = e.clientX; startY = e.clientY;
+                if (!modal.style.left) modal.style.left = '50%';
+                if (!modal.style.top) modal.style.top = '20%';
+                startLeft = modal.offsetLeft; startTop = modal.offsetTop;
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            };
+            const onMouseMove = (e) => {
+                if (!isDragging) return;
+                const dx = e.clientX - startX; const dy = e.clientY - startY;
+                let newLeft = startLeft + dx; let newTop = startTop + dy;
+                const vw = window.innerWidth; const vh = window.innerHeight;
+                const rect = modal.getBoundingClientRect();
+                const maxLeft = vw - rect.width; const maxTop = vh - rect.height;
+                newLeft = Math.max(0, Math.min(newLeft, Math.max(0, maxLeft)));
+                newTop = Math.max(0, Math.min(newTop, Math.max(0, maxTop)));
+                modal.style.left = newLeft + 'px';
+                modal.style.top = newTop + 'px';
+            };
+            const onMouseUp = () => {
+                isDragging = false;
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            };
+            header.addEventListener('mousedown', onMouseDown);
+            const close = () => { modal.style.display = 'none'; };
+            document.getElementById('pos-edit-close').addEventListener('click', close);
+            document.getElementById('pos-edit-cancel').addEventListener('click', close);
+            const form = document.getElementById('pos-edit-form');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = Number(modal.dataset.id);
+                const existing = getPositionById(id);
+                if (!existing) { showAlert('Không tìm thấy vị trí', 'error'); return; }
+                const title = (document.getElementById('editp-title').value || '').trim();
+                const deptVal = (document.getElementById('editp-dept').value || '');
+                const baseSalary = Number(document.getElementById('editp-salary').value);
+                if (!title) { showAlert('Tên vị trí không được để trống', 'error'); return; }
+                if (!deptVal) { showAlert('Vui lòng chọn phòng ban', 'error'); return; }
+                const departmentId = Number(deptVal);
+                updatePosition({ id, title, departmentId, baseSalary: Number.isFinite(baseSalary) ? baseSalary : 0 });
+                showAlert('Cập nhật vị trí thành công');
+                close();
+                renderTable();
+            });
+        }
+        modal.dataset.id = String(posId);
+        const deptSelect = modal.querySelector('#editp-dept');
+        const deptsNow = DeptDB.getAllDepartments();
+        deptSelect.innerHTML = deptsNow.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+        const titleInput = modal.querySelector('#editp-title');
+        const salaryInput = modal.querySelector('#editp-salary');
+        titleInput.value = pos.title || '';
+        salaryInput.value = String(Number(pos.baseSalary) || 0);
+        deptSelect.value = String(pos.departmentId || '');
+        modal.style.display = 'block';
+    };
     tableWrapper.addEventListener('click', async (event) => {
-        const button = event.target.closest('button[data-action="delete"]');
-        if (!button) {
+        const btn = event.target.closest('button');
+        if (!btn) return;
+        const action = btn.dataset.action;
+        const id = Number(btn.dataset.id);
+        if (!action || Number.isNaN(id)) return;
+        if (action === 'delete') {
+            const confirmed = await showConfirm('Bạn có chắc chắn muốn xóa vị trí này?');
+            if (!confirmed) return;
+            if (deletePosition(id)) {
+                showAlert('Đã xóa vị trí');
+                const modal = document.getElementById('pos-edit-modal');
+                if (modal) modal.style.display = 'none';
+                renderTable();
+            } else {
+                showAlert('Không tìm thấy vị trí để xóa', 'error');
+            }
             return;
         }
-        const id = Number(button.dataset.id);
-        if (Number.isNaN(id)) {
-            return;
-        }
-        const confirmed = await showConfirm('Bạn có chắc chắn muốn xóa vị trí này?');
-        if (!confirmed) {
-            return;
-        }
-        if (deletePosition(id)) {
-            showAlert('Đã xóa vị trí');
-            renderTable();
-        } else {
-            showAlert('Không tìm thấy vị trí để xóa', 'error');
+        if (action === 'edit') {
+            openEditModal(id);
         }
     });
 };
