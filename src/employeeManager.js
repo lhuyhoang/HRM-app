@@ -110,7 +110,6 @@ export const render = (container) => {
                         <label for="madd-dept">Phòng ban</label>
                         <select id="madd-dept" required>
                             <option value="">-- Chọn phòng ban --</option>
-                            ${deptOptions}
                         </select>
                     </div>
                     <div class="form-group">
@@ -170,6 +169,16 @@ export const render = (container) => {
         const mDept = document.getElementById('madd-dept');
         const mPos = document.getElementById('madd-pos');
         const mPosHint = document.getElementById('madd-pos-hint');
+        const refreshDeptOptions = (selectedId = null) => {
+            const depts = DeptDB.getAllDepartments();
+            const opts = depts.map(d => `<option value="${d.id}" ${selectedId && d.id === selectedId ? 'selected' : ''}>${d.name}</option>`).join('');
+            mDept.innerHTML = `<option value="">-- Chọn phòng ban --</option>${opts}`;
+        };
+        refreshDeptOptions();
+        mDept.addEventListener('focus', () => {
+            const current = mDept.value ? Number(mDept.value) : null;
+            refreshDeptOptions(current);
+        });
         const resetModalPos = () => { resetPos(mPos, '-- Chọn vị trí --', true); if (mPosHint) mPosHint.textContent = ''; };
         resetModalPos();
         mDept.addEventListener('change', () => {
