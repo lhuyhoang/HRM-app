@@ -4,16 +4,14 @@ import * as posDb from './position.js';
 import { showAlert } from './uiHelpers.js';
 export const render = (container) => {
     const departments = deptDb.getAllDepartments();
-    const positions = posDb.getAllPositions();
-    if (departments.length === 0 || positions.length === 0) {
+    if (departments.length === 0) {
         container.innerHTML = `
             <h2>Thêm Nhân viên Mới</h2>
-            <p>Vui lòng tạo phòng ban và vị trí trước khi thêm nhân viên.</p>
+            <p>Vui lòng tạo phòng ban trước khi thêm nhân viên.</p>
         `;
         return;
     }
     const deptOptions = departments.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
-    const posOptions = positions.map(p => `<option value="${p.id}">${p.title}</option>`).join('');
     container.innerHTML = `
     <h2>Thêm Nhân viên Mới</h2>
         <form id="add-employee-form">
@@ -23,11 +21,17 @@ export const render = (container) => {
             </div>
             <div class="form-group">
                 <label for="department">Phòng ban</label>
-                <select id="department" required>${deptOptions}</select>
+                <select id="department" required>
+                    <option value="">-- Chọn phòng ban --</option>
+                    ${deptOptions}
+                </select>
             </div>
             <div class="form-group">
                 <label for="position">Vị trí</label>
-                <select id="position" required>${posOptions}</select>
+                <select id="position" required disabled>
+                    <option value="">-- Chọn vị trí --</option>
+                </select>
+                <small id="position-hint" style="display:block;color:#6c757d;margin-top:4px;"></small>
             </div>
             <div class="form-group">
                 <label for="salary">Lương ($)</label>
@@ -41,12 +45,42 @@ export const render = (container) => {
         </form>
     `;
     const form = container.querySelector('#add-employee-form');
+    const deptSelect = form.querySelector('#department');
+    const posSelect = form.querySelector('#position');
+    const posHint = form.querySelector('#position-hint');
+
+    const resetPositions = () => {
+        posSelect.innerHTML = `<option value="">-- Chọn vị trí --</option>`;
+        posSelect.disabled = true;
+        if (posHint) posHint.textContent = '';
+    };
+    const populatePositions = (departmentId) => {
+        const positions = posDb.getPositionsByDepartment(departmentId);
+        if (!positions || positions.length === 0) {
+            resetPositions();
+            if (posHint) posHint.textContent = 'Phòng ban này chưa có vị trí. Vui lòng tạo vị trí trước.';
+            return;
+        }
+        const options = positions.map(p => `<option value="${p.id}">${p.title}</option>`).join('');
+        posSelect.innerHTML = `<option value="">-- Chọn vị trí --</option>${options}`;
+        posSelect.disabled = false;
+        if (posHint) posHint.textContent = '';
+    };
+
+    // Initialize positions based on default department selection (if any)
+    resetPositions();
+    deptSelect.addEventListener('change', () => {
+        const val = deptSelect.value;
+        resetPositions();
+        if (!val) return;
+        populatePositions(Number(val));
+    });
     form.addEventListener('submit', (e) => {
         e.preventDefault();
         const newEmployee = {
             name: container.querySelector('#name').value.trim(),
-            departmentId: Number(container.querySelector('#department').value),
-            positionId: Number(container.querySelector('#position').value),
+            departmentId: Number(deptSelect.value),
+            positionId: Number(posSelect.value),
             salary: Number.parseFloat(container.querySelector('#salary').value),
             hireDate: container.querySelector('#hireDate').value,
             bonus: 0,
@@ -56,8 +90,17 @@ export const render = (container) => {
             showAlert('Dữ liệu không hợp lệ', 'error');
             return;
         }
+        if (!deptSelect.value) {
+            showAlert('Vui lòng chọn phòng ban', 'error');
+            return;
+        }
+        if (!posSelect.value) {
+            showAlert('Vui lòng chọn vị trí (hãy tạo vị trí cho phòng ban nếu chưa có)', 'error');
+            return;
+        }
         db.addEmployee(newEmployee);
         showAlert('Thêm nhân viên thành công');
         form.reset();
+        resetPositions();
     });
 };
