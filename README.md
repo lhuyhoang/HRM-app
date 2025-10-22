@@ -1,5 +1,5 @@
 # HRM-app
-=====================================
+==================================
 Ứng dụng quản lý nhân sự (HRM) chạy trực tiếp trên trình duyệt, lưu dữ liệu bằng LocalStorage. Không cần server.
 
 ## Tính năng chính
