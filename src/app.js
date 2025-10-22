@@ -2,8 +2,7 @@ import * as Auth from './auth.js';
 import * as Register from './register.js';
 import * as EmployeeDB from './employeeDb.js';
 import * as DeptDB from './department.js';
-import * as AddEmployee from './addEmployee.js';
-import * as SearchEmployee from './searchEmployee.js';
+import * as EmployeeManager from './employeeManager.js';
 import * as Department from './department.js';
 import * as Position from './position.js';
 import * as Salary from './salary.js';
@@ -16,8 +15,10 @@ const sidebar = document.getElementById('sidebar');
 const logoutBtn = document.getElementById('logout-btn');
 const appContent = document.getElementById('app-content');
 const routes = {
-    'addEmployee': AddEmployee.render,
-    'searchEmployee': SearchEmployee.render,
+    // Map old routes to the unified manager for convenience
+    'addEmployee': EmployeeManager.render,
+    'searchEmployee': EmployeeManager.render,
+    'employees': EmployeeManager.render,
     'department': Department.render,
     'departments': Department.render,
     'dashboard': (container) => {
