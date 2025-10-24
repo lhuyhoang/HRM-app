@@ -158,22 +158,17 @@ export const render = (container) => {
         if (!pos) { showAlert('Không tìm thấy vị trí', 'error'); return; }
         const depts = DeptDB.getAllDepartments();
         if (depts.length === 0) { showAlert('Vui lòng tạo phòng ban trước', 'error'); return; }
-
         let modal = document.getElementById('pos-edit-modal');
         if (!modal) {
             modal = document.createElement('div');
             modal.id = 'pos-edit-modal';
-            modal.style.cssText = [
-                'position:fixed', 'top:20%', 'left:50%', 'transform:translate(-50%, -20%)',
-                'width:420px', 'max-width:90vw', 'background:#fff', 'border:1px solid #ddd', 'border-radius:8px',
-                'box-shadow:0 10px 30px rgba(0,0,0,.2)', 'z-index:9999'
-            ].join(';');
+            modal.className = 'hrm-modal';
             modal.innerHTML = `
-                <div id="pos-edit-header" style="cursor:move; padding:.6rem .8rem; background:#0d6efd; color:#fff; border-top-left-radius:8px; border-top-right-radius:8px; display:flex; align-items:center; justify-content:space-between;">
+                <div id="pos-edit-header" class="hrm-modal__header is-primary">
                     <strong>Sửa vị trí</strong>
-                    <button id="pos-edit-close" style="background:transparent;border:none;color:#fff;font-size:18px;line-height:1;cursor:pointer">✕</button>
+                    <button id="pos-edit-close" class="hrm-modal__close">✕</button>
                 </div>
-                <div style="padding:1rem;">
+                <div class="hrm-modal__body">
                     <form id="pos-edit-form">
                         <div class="form-group">
                             <label for="editp-title">Tên vị trí</label>

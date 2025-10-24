@@ -82,17 +82,13 @@ export const render = (container) => {
         }
         modal = document.createElement('div');
         modal.id = 'mgr-add-modal';
-        modal.style.cssText = [
-            'position:fixed', 'top:20%', 'left:50%', 'transform:translate(-50%, -20%)',
-            'width:420px', 'max-width:90vw', 'background:#fff', 'border:1px solid #ddd', 'border-radius:8px',
-            'box-shadow:0 10px 30px rgba(0,0,0,.2)', 'z-index:9999'
-        ].join(';');
+        modal.className = 'hrm-modal';
         modal.innerHTML = `
-            <div id="mgr-add-modal-header" style="cursor:move; padding:.6rem .8rem; background:#0d6efd; color:#fff; border-top-left-radius:8px; border-top-right-radius:8px; display:flex; align-items:center; justify-content:space-between;">
+            <div id="mgr-add-modal-header" class="hrm-modal__header is-primary">
                 <strong>Thêm nhân viên</strong>
-                <button id="mgr-add-close" style="background:transparent;border:none;color:#fff;font-size:18px;line-height:1;cursor:pointer">✕</button>
+                <button id="mgr-add-close" class="hrm-modal__close">✕</button>
             </div>
-            <div style="padding:1rem;">
+            <div class="hrm-modal__body">
                 <form id="mgr-add-form-modal">
                     <div class="form-group">
                         <label for="madd-name">Họ và Tên</label>
@@ -223,17 +219,13 @@ export const render = (container) => {
         if (!modal) {
             modal = document.createElement('div');
             modal.id = 'mgr-edit-modal';
-            modal.style.cssText = [
-                'position:fixed', 'top:22%', 'left:50%', 'transform:translate(-50%, -22%)',
-                'width:460px', 'max-width:92vw', 'background:#fff', 'border:1px solid #ddd', 'border-radius:8px',
-                'box-shadow:0 10px 30px rgba(0,0,0,.2)', 'z-index:9999'
-            ].join(';');
+            modal.className = 'hrm-modal hrm-modal--md';
             modal.innerHTML = `
-                <div id="mgr-edit-modal-header" style="cursor:move; padding:.6rem .8rem; background:#6c757d; color:#fff; border-top-left-radius:8px; border-top-right-radius:8px; display:flex; align-items:center; justify-content:space-between;">
+                <div id="mgr-edit-modal-header" class="hrm-modal__header is-secondary">
                     <strong>Sửa nhân viên</strong>
-                    <button id="mgr-edit-close" style="background:transparent;border:none;color:#fff;font-size:18px;line-height:1;cursor:pointer">✕</button>
+                    <button id="mgr-edit-close" class="hrm-modal__close">✕</button>
                 </div>
-                <div style="padding:1rem;">
+                <div class="hrm-modal__body">
                     <form id="mgr-edit-form-modal">
                         <div class="form-group">
                             <label for="medit-name">Họ và Tên</label>
