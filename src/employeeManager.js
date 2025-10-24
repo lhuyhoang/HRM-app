@@ -216,6 +216,140 @@ export const render = (container) => {
         });
     };
     addToggleBtn.addEventListener('click', openAddModal);
+    const openEditModal = (empId) => {
+        const emp = EmployeeDB.getEmployeeById(empId);
+        if (!emp) { showAlert('Không tìm thấy nhân viên', 'error'); return; }
+        let modal = document.getElementById('mgr-edit-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'mgr-edit-modal';
+            modal.style.cssText = [
+                'position:fixed', 'top:22%', 'left:50%', 'transform:translate(-50%, -22%)',
+                'width:460px', 'max-width:92vw', 'background:#fff', 'border:1px solid #ddd', 'border-radius:8px',
+                'box-shadow:0 10px 30px rgba(0,0,0,.2)', 'z-index:9999'
+            ].join(';');
+            modal.innerHTML = `
+                <div id="mgr-edit-modal-header" style="cursor:move; padding:.6rem .8rem; background:#6c757d; color:#fff; border-top-left-radius:8px; border-top-right-radius:8px; display:flex; align-items:center; justify-content:space-between;">
+                    <strong>Sửa nhân viên</strong>
+                    <button id="mgr-edit-close" style="background:transparent;border:none;color:#fff;font-size:18px;line-height:1;cursor:pointer">✕</button>
+                </div>
+                <div style="padding:1rem;">
+                    <form id="mgr-edit-form-modal">
+                        <div class="form-group">
+                            <label for="medit-name">Họ và Tên</label>
+                            <input type="text" id="medit-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="medit-phone">Số điện thoại</label>
+                            <input type="tel" id="medit-phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="medit-email">Email</label>
+                            <input type="email" id="medit-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="medit-dept">Phòng ban</label>
+                            <select id="medit-dept" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="medit-pos">Vị trí</label>
+                            <select id="medit-pos" required disabled>
+                                <option value="">-- Chọn vị trí --</option>
+                            </select>
+                            <small id="medit-pos-hint" style="display:block;color:#6c757d;margin-top:4px;"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="medit-salary">Lương ($)</label>
+                            <input type="number" id="medit-salary" min="0" required>
+                        </div>
+                        <div style="display:flex; gap:.5rem; justify-content:flex-end; margin-top:.5rem;">
+                            <button type="button" id="medit-cancel" class="secondary">Hủy</button>
+                            <button type="submit">Lưu</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            const header = document.getElementById('mgr-edit-modal-header');
+            let isDragging = false; let startX = 0; let startY = 0; let startLeft = 0; let startTop = 0;
+            const onMouseDown = (e) => {
+                isDragging = true;
+                modal.style.transform = 'none';
+                startX = e.clientX; startY = e.clientY;
+                if (!modal.style.left) modal.style.left = '50%';
+                if (!modal.style.top) modal.style.top = '22%';
+                startLeft = modal.offsetLeft; startTop = modal.offsetTop;
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            };
+            const onMouseMove = (e) => {
+                if (!isDragging) return;
+                const dx = e.clientX - startX; const dy = e.clientY - startY;
+                let newLeft = startLeft + dx; let newTop = startTop + dy;
+                const vw = window.innerWidth; const vh = window.innerHeight;
+                const rect = modal.getBoundingClientRect();
+                const maxLeft = vw - rect.width; const maxTop = vh - rect.height;
+                newLeft = Math.max(0, Math.min(newLeft, Math.max(0, maxLeft)));
+                newTop = Math.max(0, Math.min(newTop, Math.max(0, maxTop)));
+                modal.style.left = newLeft + 'px';
+                modal.style.top = newTop + 'px';
+            };
+            const onMouseUp = () => {
+                isDragging = false;
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            };
+            header.addEventListener('mousedown', onMouseDown);
+            const close = () => { modal.style.display = 'none'; };
+            document.getElementById('mgr-edit-close').addEventListener('click', close);
+            document.getElementById('medit-cancel').addEventListener('click', close);
+            const mForm = document.getElementById('mgr-edit-form-modal');
+            mForm.addEventListener('submit', (ev) => {
+                ev.preventDefault();
+                const id = modal.dataset.empId;
+                const base = EmployeeDB.getEmployeeById(id);
+                if (!base) { showAlert('Không tìm thấy nhân viên', 'error'); return; }
+                const name = (document.getElementById('medit-name').value || '').trim();
+                const phone = (document.getElementById('medit-phone').value || '').trim();
+                const email = (document.getElementById('medit-email').value || '').trim();
+                const departmentId = Number((document.getElementById('medit-dept')).value);
+                const positionId = Number((document.getElementById('medit-pos')).value);
+                const salary = Number.parseFloat((document.getElementById('medit-salary')).value);
+                const phonePattern = /^[0-9+()\-\s]{9,20}$/;
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!name || Number.isNaN(salary) || salary < 0) { showAlert('Dữ liệu không hợp lệ', 'error'); return; }
+                if (!phone || !phonePattern.test(phone)) { showAlert('Số điện thoại không hợp lệ', 'error'); return; }
+                if (!email || !emailPattern.test(email)) { showAlert('Email không hợp lệ', 'error'); return; }
+                if (!departmentId) { showAlert('Vui lòng chọn phòng ban', 'error'); return; }
+                if (!positionId) { showAlert('Vui lòng chọn vị trí', 'error'); return; }
+                EmployeeDB.updateEmployee({ ...base, name, phone, email, departmentId, positionId, salary });
+                showAlert('Cập nhật nhân viên thành công');
+                close();
+                renderTable();
+            });
+        }
+        modal.dataset.empId = empId;
+        const dSel = document.getElementById('medit-dept');
+        const pSel = document.getElementById('medit-pos');
+        const pHint = document.getElementById('medit-pos-hint');
+        const deptsNow = DeptDB.getAllDepartments();
+        dSel.innerHTML = [`<option value="">-- Chọn phòng ban --</option>`, ...deptsNow.map(d => `<option value="${d.id}">${d.name}</option>`)].join('');
+        dSel.value = String(emp.departmentId || '');
+        const ok = emp.departmentId ? fillPositions(pSel, Number(emp.departmentId), '-- Chọn vị trí --') : (resetPos(pSel, '-- Chọn vị trí --', true), false);
+        if (!ok && pHint) pHint.textContent = 'Phòng ban này chưa có vị trí. Vui lòng tạo vị trí trước.'; else if (pHint) pHint.textContent = '';
+        pSel.value = String(emp.positionId || '');
+        document.getElementById('medit-name').value = emp.name || '';
+        document.getElementById('medit-phone').value = emp.phone || '';
+        document.getElementById('medit-email').value = emp.email || '';
+        document.getElementById('medit-salary').value = String(Number(emp.salary) || 0);
+        dSel.onchange = () => {
+            resetPos(pSel, '-- Chọn vị trí --', true);
+            if (!dSel.value) return;
+            const ok2 = fillPositions(pSel, Number(dSel.value), '-- Chọn vị trí --');
+            if (!ok2 && pHint) pHint.textContent = 'Phòng ban này chưa có vị trí. Vui lòng tạo vị trí trước.'; else if (pHint) pHint.textContent = '';
+        };
+        modal.style.display = 'block';
+    };
     const getFilteredEmployees = () => {
         const all = EmployeeDB.getAllEmployees();
         const deptVal = deptSelect.value;
@@ -285,78 +419,7 @@ export const render = (container) => {
             return;
         }
         if (btn.classList.contains('mgr-edit')) {
-            const emp = EmployeeDB.getEmployeeById(id);
-            if (!emp) return;
-            const deptOpts = DeptDB.getAllDepartments().map(d => `<option value="${d.id}" ${d.id === emp.departmentId ? 'selected' : ''}>${d.name}</option>`).join('');
-            const allPos = PositionDB.getAllPositions();
-            const posOpts = allPos.map(p => `<option value="${p.id}" ${p.id === emp.positionId ? 'selected' : ''}>${p.title}</option>`).join('');
-            editContainer.innerHTML = `
-                <div class="form-container">
-                    <h3>Sửa: ${emp.name} (ID: ${emp.id})</h3>
-                    <form id="mgr-edit-form">
-                        <div class="form-group">
-                            <label for="edit-name">Họ và Tên</label>
-                            <input type="text" id="edit-name" value="${emp.name || ''}" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-phone">Số điện thoại</label>
-                            <input type="tel" id="edit-phone" value="${emp.phone || ''}" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-email">Email</label>
-                            <input type="email" id="edit-email" value="${emp.email || ''}" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-dept">Phòng ban</label>
-                            <select id="edit-dept" required>${deptOpts}</select>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-pos">Vị trí</label>
-                            <select id="edit-pos" required>${posOpts}</select>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-salary">Lương ($)</label>
-                            <input type="number" id="edit-salary" value="${Number(emp.salary) || 0}" min="0" required>
-                        </div>
-                        <button type="submit">Lưu</button>
-                        <button type="button" id="mgr-cancel-edit" class="secondary">Hủy</button>
-                    </form>
-                </div>
-            `;
-            const editForm = document.getElementById('mgr-edit-form');
-            const editDept = editForm.querySelector('#edit-dept');
-            const editPos = editForm.querySelector('#edit-pos');
-            editDept.addEventListener('change', () => {
-                const val = editDept.value;
-                if (!val) return;
-                const ok = fillPositions(editPos, Number(val), '-- Chọn vị trí --');
-                if (!ok) {
-                    editPos.innerHTML = '<option value="">-- Chọn vị trí --</option>';
-                }
-            });
-            editForm.addEventListener('submit', (ev) => {
-                ev.preventDefault();
-                const name = editForm.querySelector('#edit-name').value.trim();
-                const phone = editForm.querySelector('#edit-phone').value.trim();
-                const email = editForm.querySelector('#edit-email').value.trim();
-                const departmentId = Number(editDept.value);
-                const positionId = Number(editPos.value);
-                const salary = Number.parseFloat(editForm.querySelector('#edit-salary').value);
-                const phonePattern = /^[0-9+()\-\s]{9,20}$/;
-                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!name || Number.isNaN(salary) || salary < 0) { showAlert('Dữ liệu không hợp lệ', 'error'); return; }
-                if (!phone || !phonePattern.test(phone)) { showAlert('Số điện thoại không hợp lệ', 'error'); return; }
-                if (!email || !emailPattern.test(email)) { showAlert('Email không hợp lệ', 'error'); return; }
-                if (!departmentId) { showAlert('Vui lòng chọn phòng ban', 'error'); return; }
-                if (!positionId) { showAlert('Vui lòng chọn vị trí', 'error'); return; }
-                EmployeeDB.updateEmployee({ ...emp, name, phone, email, departmentId, positionId, salary });
-                showAlert('Cập nhật nhân viên thành công');
-                editContainer.innerHTML = '';
-                renderTable();
-            });
-            document.getElementById('mgr-cancel-edit').addEventListener('click', () => {
-                editContainer.innerHTML = '';
-            });
+            openEditModal(id);
         }
     });
     renderTable();
