@@ -15,7 +15,6 @@ const sidebar = document.getElementById('sidebar');
 const logoutBtn = document.getElementById('logout-btn');
 const appContent = document.getElementById('app-content');
 const routes = {
-    // Map old routes to the unified manager for convenience
     'addEmployee': EmployeeManager.render,
     'searchEmployee': EmployeeManager.render,
     'employees': EmployeeManager.render,
