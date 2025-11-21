@@ -1,7 +1,7 @@
-import * as EmployeeDB from './employeeDb.js';
-import * as DeptDB from './department.js';
-import * as PositionDB from './position.js';
-import { createTable, showAlert, showConfirm } from './uiHelpers.js';
+import * as EmployeeDB from './employeeDb.js?v=2';
+import * as DeptDB from './department.js?v=2';
+import * as PositionDB from './position.js?v=2';
+import { createTable, showAlert, showConfirm } from './uiHelpers.js?v=2';
 const STORAGE_KEY = 'hrm_leave_requests';
 const readRequests = () => {
     try {
@@ -51,9 +51,9 @@ const STATUS_LABELS = {
     approved: 'Đã duyệt',
     rejected: 'Từ chối',
 };
-export const render = (container) => {
+export const render = async (container) => {
     init();
-    const employees = EmployeeDB.getAllEmployees();
+    const employees = await EmployeeDB.getAllEmployees();
     if (employees.length === 0) {
         container.innerHTML = `
             <h2>Quản lý nghỉ phép</h2>
@@ -61,7 +61,7 @@ export const render = (container) => {
         `;
         return;
     }
-    const departments = DeptDB.getAllDepartments();
+    const departments = await DeptDB.getAllDepartments();
     const deptOptions = departments
         .map((dept) => `<option value="${dept.id}">${dept.name}</option>`)
         .join('');
@@ -100,15 +100,16 @@ export const render = (container) => {
         selectEl.innerHTML = `<option value="">${placeholder}</option>`;
         selectEl.disabled = disabled;
     };
-    const populatePositions = (departmentId) => {
-        const positions = PositionDB.getPositionsByDepartment(departmentId);
+    const populatePositions = async (departmentId) => {
+        const positions = await PositionDB.getPositionsByDepartment(departmentId);
         const options = positions.map((pos) => `<option value="${pos.id}">${pos.title}</option>`).join('');
         positionSelect.innerHTML = `<option value="">-- Chọn vị trí --</option>${options}`;
         positionSelect.disabled = positions.length === 0;
     };
-    const populateEmployees = (departmentId, positionId) => {
-        const filtered = EmployeeDB.getAllEmployees().filter(
-            (emp) => emp.departmentId === departmentId && emp.positionId === positionId
+    const populateEmployees = async (departmentId, positionId) => {
+        const allEmployees = await EmployeeDB.getAllEmployees();
+        const filtered = allEmployees.filter(
+            (emp) => (emp.departmentId || emp.department_id) === departmentId && (emp.positionId || emp.position_id) === positionId
         );
         const options = filtered.map((emp) => `<option value="${emp.id}">${emp.name} (${emp.id})</option>`).join('');
         employeeSelect.innerHTML = `<option value="">-- Chọn nhân viên --</option>${options}`;
@@ -117,24 +118,24 @@ export const render = (container) => {
     resetSelect(positionSelect, '-- Chọn vị trí --', true);
     resetSelect(employeeSelect, '-- Chọn nhân viên --', true);
 
-    deptSelect.addEventListener('change', () => {
+    deptSelect.addEventListener('change', async () => {
         const deptVal = deptSelect.value;
         resetSelect(positionSelect, '-- Chọn vị trí --', true);
         resetSelect(employeeSelect, '-- Chọn nhân viên --', true);
         if (!deptVal) return;
-        populatePositions(Number(deptVal));
+        await populatePositions(Number(deptVal));
     });
 
-    positionSelect.addEventListener('change', () => {
+    positionSelect.addEventListener('change', async () => {
         const deptVal = deptSelect.value;
         const posVal = positionSelect.value;
         resetSelect(employeeSelect, '-- Chọn nhân viên --', true);
         if (!deptVal || !posVal) return;
-        populateEmployees(Number(deptVal), Number(posVal));
+        await populateEmployees(Number(deptVal), Number(posVal));
     });
-    const renderTable = () => {
+    const renderTable = async () => {
         const requests = getAllRequests();
-        const currentEmployees = EmployeeDB.getAllEmployees();
+        const currentEmployees = await EmployeeDB.getAllEmployees();
         if (requests.length === 0) {
             tableWrapper.innerHTML = '<p>Chưa có yêu cầu nghỉ phép.</p>';
             return;
@@ -143,7 +144,7 @@ export const render = (container) => {
             ['Nhân viên', 'Số điện thoại', 'Email', 'Thời gian', 'Lý do', 'Trạng thái', 'Hành động'],
             requests,
             (request) => {
-                const employee = currentEmployees.find((emp) => emp.id === request.employeeId);
+                const employee = currentEmployees.find((emp) => Number(emp.id) === Number(request.employeeId));
                 const statusLabel = STATUS_LABELS[request.status] || request.status;
                 const phone = employee?.phone || '';
                 const email = employee?.email || '';
@@ -155,10 +156,28 @@ export const render = (container) => {
                         <td>${request.startDate} → ${request.endDate}</td>
                         <td>${request.reason}</td>
                         <td>${statusLabel}</td>
-                        <td>
-                            <button data-action="approve" data-id="${request.id}">Duyệt</button>
-                            <button data-action="reject" data-id="${request.id}">Từ chối</button>
-                            <button class="danger" data-action="delete" data-id="${request.id}">Xóa</button>
+                        <td style="padding: 8px;">
+                            <div style="display: flex; gap: 8px; align-items: center; justify-content: center;">
+                                <button data-action="approve" data-id="${request.id}" style="background: transparent; border: none; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="20 6 9 17 4 12"/>
+                                    </svg>
+                                </button>
+                                <button data-action="reject" data-id="${request.id}" style="background: transparent; border: none; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <line x1="15" y1="9" x2="9" y2="15"/>
+                                    </svg>
+                                </button>
+                                <button data-action="delete" data-id="${request.id}" style="background: transparent; border: none; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="3 6 5 6 21 6"/>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                        <line x1="10" y1="11" x2="10" y2="17"/>
+                                        <line x1="14" y1="11" x2="14" y2="17"/>
+                                    </svg>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -166,7 +185,7 @@ export const render = (container) => {
         );
         tableWrapper.innerHTML = tableHtml;
     };
-    form.addEventListener('submit', (event) => {
+    form.addEventListener('submit', async (event) => {
         event.preventDefault();
         const deptVal = deptSelect.value;
         const posVal = positionSelect.value;
@@ -178,8 +197,10 @@ export const render = (container) => {
             showAlert('Vui lòng chọn phòng ban, vị trí, nhân viên và điền đầy đủ thông tin', 'error');
             return;
         }
-        const emp = EmployeeDB.getEmployeeById(employeeId);
-        if (!emp || emp.departmentId !== Number(deptVal) || emp.positionId !== Number(posVal)) {
+        const emp = await EmployeeDB.getEmployeeById(employeeId);
+        const empDeptId = emp?.departmentId || emp?.department_id;
+        const empPosId = emp?.positionId || emp?.position_id;
+        if (!emp || empDeptId !== Number(deptVal) || empPosId !== Number(posVal)) {
             showAlert('Nhân viên không thuộc phòng ban/ vị trí đã chọn', 'error');
             return;
         }
@@ -193,7 +214,7 @@ export const render = (container) => {
         resetSelect(positionSelect, '-- Chọn vị trí --', true);
         resetSelect(employeeSelect, '-- Chọn nhân viên --', true);
         showAlert('Đã tạo yêu cầu nghỉ phép');
-        renderTable();
+        await renderTable();
     });
     tableWrapper.addEventListener('click', async (event) => {
         const button = event.target.closest('button[data-action]');
@@ -208,7 +229,7 @@ export const render = (container) => {
         if (action === 'approve' || action === 'reject') {
             updateStatus(id, action === 'approve' ? 'approved' : 'rejected');
             showAlert('Đã cập nhật trạng thái');
-            renderTable();
+            await renderTable();
             return;
         }
         if (action === 'delete') {
@@ -218,8 +239,8 @@ export const render = (container) => {
             }
             deleteRequest(id);
             showAlert('Đã xóa yêu cầu');
-            renderTable();
+            await renderTable();
         }
     });
-    renderTable();
+    await renderTable();
 };

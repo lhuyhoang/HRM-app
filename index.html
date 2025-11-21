@@ -1,40 +1,108 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Lý Nhân Sự</title>
-    <link rel="stylesheet" href="style.css">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>HRM System - Human Resource Management</title>
+    <link rel="stylesheet" href="frontend/css/style.css?v=7">
+    <link rel="stylesheet" href="frontend/css/landing.css?v=2">
+    <link rel="stylesheet" href="frontend/css/auth.css?v=1">
 </head>
-<body>
-    <div id="app-container">
-        <div id="auth-container"></div>
-        <div id="main-dashboard" class="hidden">
-            <header>
-                <h1>HRM Dashboard</h1>
-                <button id="logout-btn">Đăng xuất</button>
-            </header>
-            <div class="dashboard-body">
-                <nav id="sidebar">
-                    <h2>Menu</h2>
-                    <ul>
-                        <li><a href="#" data-module="dashboard">Trang chủ</a></li>
-                        <li><a href="#" data-module="addEmployee">Quản lý nhân viên</a></li>
-                        <li><a href="#" data-module="departments">Quản lý Phòng ban</a></li>
-                        <li><a href="#" data-module="positions">Quản lý Vị trí</a></li>
-                        <li><a href="#" data-module="salary">Bảng lương</a></li>
-                        <li><a href="#" data-module="attendance">Chấm công</a></li>
-                        <li><a href="#" data-module="leaves">Quản lý Nghỉ phép</a></li>
-                        <li><a href="#" data-module="performance">Đánh giá Hiệu suất</a></li>
-                    </ul>
-                </nav>
-                <main id="app-content">
-                    <h2>Chào mừng đến với hệ thống HRM!</h2>
-                    <p>Chọn chức năng từ menu bên trái để bắt đầu.</p>
-                </main>
+
+<body class="landing-page">
+    <nav class="landing-nav">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-text">HRM System</span>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-secondary" id="nav-about-btn">About</button>
+                <button class="btn-primary" id="nav-login-btn">Login</button>
             </div>
         </div>
-    </div>
-    <script type="module" src="src/app.js"></script>
+    </nav>
+
+    <section class="hero-section" id="home">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">Human Resource Management System</h1>
+                <p class="hero-subtitle">Powerful tools to manage your workforce efficiently</p>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">👥</div>
+                        <h3>Employee Management</h3>
+                        <p>Manage employee records, departments, and positions</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>Attendance Tracking</h3>
+                        <p>Monitor and track employee attendance in real-time</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💰</div>
+                        <h3>Payroll System</h3>
+                        <p>Automated salary calculation and payment processing</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📈</div>
+                        <h3>Performance Review</h3>
+                        <p>Track and evaluate employee performance metrics</p>
+                    </div>
+                </div>
+
+                <button class="cta-button" id="hero-login-btn">
+                    <span>Login</span>
+                    <span class="arrow">→</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats-section">
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-icon">🌟</div>
+                <div class="stat-value">1K+</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">🌍</div>
+                <div class="stat-value">5+</div>
+                <div class="stat-label">Countries</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-value">97%</div>
+                <div class="stat-label">Satisfaction</div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLoginBtn = document.getElementById('nav-login-btn');
+            const heroLoginBtn = document.getElementById('hero-login-btn');
+
+            if (navLoginBtn) {
+                navLoginBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.location.href = '/hrmapp/frontend/pages/login.html';
+                });
+            }
+
+            if (heroLoginBtn) {
+                heroLoginBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.location.href = '/hrmapp/frontend/pages/login.html';
+                });
+            }
+        });
+    </script>
 </body>
+
 </html>

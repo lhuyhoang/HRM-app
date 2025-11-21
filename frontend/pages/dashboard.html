@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Dashboard - HRM System</title>
+    <link rel="stylesheet" href="../css/style.css?v=6">
+    <link rel="stylesheet" href="../css/settings.css?v=1">
+</head>
+
+<body>
+    <div id="app-container">
+        <div id="main-dashboard">
+            <header>
+                <h1>HRM Dashboard</h1>
+                <button id="logout-btn">Đăng xuất</button>
+            </header>
+            <div class="dashboard-body">
+                <nav id="sidebar">
+                    <h2>Menu</h2>
+                    <ul>
+                        <li><a href="#" data-module="dashboard">Dashboard</a></li>
+                        <li class="has-submenu">
+                            <a href="#" class="submenu-toggle">HR Management</a>
+                            <ul class="submenu">
+                                <li><a href="#" data-module="employees">Employees</a></li>
+                                <li><a href="#" data-module="departments">Departments</a></li>
+                                <li><a href="#" data-module="positions">Positions</a></li>
+                                <li><a href="#" data-module="leaves">Leaves</a></li>
+                                <li><a href="#" data-module="performance">Performance</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#" data-module="salary">Salary Management</a></li>
+                        <li><a href="#" data-module="attendance">Attendance</a></li>
+                        <li><a href="#" data-module="settings">Settings</a></li>
+                    </ul>
+                </nav>
+                <main id="app-content">
+                    <h2>Chào mừng đến với hệ thống HRM!</h2>
+                    <p>Chọn chức năng từ menu bên trái để bắt đầu.</p>
+                </main>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="../js/dashboard.js?v=1"></script>
+</body>
+
+</html>

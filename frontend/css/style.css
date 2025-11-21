@@ -174,19 +174,26 @@ header h1 {
 }
 
 #sidebar {
-    width: 220px;
+    width: 250px;
     background-color: #fff;
     padding: 1rem;
     border-right: 1px solid var(--border-color);
+    overflow-y: auto;
 }
 
 #sidebar h2 {
     margin-top: 0;
+    font-size: 1.25rem;
 }
 
 #sidebar ul {
     list-style: none;
     padding: 0;
+    margin: 0;
+}
+
+#sidebar ul li {
+    margin-bottom: 0.25rem;
 }
 
 #sidebar ul li a {
@@ -195,23 +202,110 @@ header h1 {
     text-decoration: none;
     color: var(--primary-color);
     border-radius: 4px;
+    transition: background-color 0.2s;
 }
 
 #sidebar ul li a:hover {
     background-color: var(--secondary-color);
 }
 
+/* Submenu styles */
+#sidebar .has-submenu>.submenu-toggle {
+    position: relative;
+    font-weight: 500;
+}
+
+#sidebar .has-submenu>.submenu-toggle::after {
+    content: '▼';
+    position: absolute;
+    right: 0.75rem;
+    font-size: 0.75rem;
+    transition: transform 0.2s;
+}
+
+#sidebar .has-submenu.active>.submenu-toggle::after {
+    transform: rotate(-180deg);
+}
+
+#sidebar .submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding-left: 0;
+}
+
+#sidebar .has-submenu.active>.submenu {
+    max-height: 500px;
+}
+
+#sidebar .submenu li {
+    margin-bottom: 0;
+}
+
+#sidebar .submenu li a {
+    padding: 0.5rem 0.75rem 0.5rem 1.5rem;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+#sidebar .submenu li a:hover {
+    color: var(--primary-color);
+    background-color: var(--secondary-color);
+}
+
 #app-content {
     flex-grow: 1;
-    padding: 2rem;
+    padding: 0;
     overflow-y: auto;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: #fff;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb-item+.breadcrumb-item::before {
+    content: '>';
+    padding: 0 0.5rem;
+    color: #6c757d;
+}
+
+.breadcrumb-item a {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.breadcrumb-item a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+    color: #212529;
+    font-weight: 500;
+}
+
+.content-wrapper {
+    padding: 2rem;
 }
 
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
-    margin-top: 1rem;
+    margin-top: 0;
 }
 
 .stat-card {

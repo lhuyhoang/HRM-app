@@ -1,7 +1,7 @@
-import * as EmployeeDB from './employeeDb.js';
-import * as DeptDB from './department.js';
-import * as PositionDB from './position.js';
-import { createTable, showAlert, showConfirm } from './uiHelpers.js';
+import * as EmployeeDB from './employeeDb.js?v=2';
+import * as DeptDB from './department.js?v=2';
+import * as PositionDB from './position.js?v=2';
+import { createTable, showAlert, showConfirm } from './uiHelpers.js?v=2';
 const STORAGE_KEY = 'hrm_attendance_records';
 const readRecords = () => {
     try {
@@ -44,9 +44,9 @@ const ATTENDANCE_STATUSES = [
     { value: 'late', label: 'Đi trễ' },
     { value: 'remote', label: 'Làm từ xa' },
 ];
-export const render = (container) => {
+export const render = async (container) => {
     init();
-    const employees = EmployeeDB.getAllEmployees();
+    const employees = await EmployeeDB.getAllEmployees();
     if (employees.length === 0) {
         container.innerHTML = `
             <h2>Chấm công</h2>
@@ -54,7 +54,7 @@ export const render = (container) => {
         `;
         return;
     }
-    const departments = DeptDB.getAllDepartments();
+    const departments = await DeptDB.getAllDepartments();
     const deptOptions = departments
         .map((dept) => `<option value="${dept.id}">${dept.name}</option>`)
         .join('');
@@ -108,15 +108,16 @@ export const render = (container) => {
         selectEl.innerHTML = `<option value="">${placeholder}</option>`;
         selectEl.disabled = disabled;
     };
-    const populatePositions = (departmentId) => {
-        const positions = PositionDB.getPositionsByDepartment(departmentId);
+    const populatePositions = async (departmentId) => {
+        const positions = await PositionDB.getPositionsByDepartment(departmentId);
         const options = positions.map((pos) => `<option value="${pos.id}">${pos.title}</option>`).join('');
         positionSelect.innerHTML = `<option value="">-- Chọn vị trí --</option>${options}`;
         positionSelect.disabled = positions.length === 0;
     };
-    const populateEmployees = (departmentId, positionId) => {
-        const filtered = EmployeeDB.getAllEmployees().filter(
-            (emp) => emp.departmentId === departmentId && emp.positionId === positionId
+    const populateEmployees = async (departmentId, positionId) => {
+        const allEmployees = await EmployeeDB.getAllEmployees();
+        const filtered = allEmployees.filter(
+            (emp) => (emp.departmentId || emp.department_id) === departmentId && (emp.positionId || emp.position_id) === positionId
         );
         const options = filtered.map((emp) => `<option value="${emp.id}">${emp.name} (${emp.id})</option>`).join('');
         employeeSelect.innerHTML = `<option value="">-- Chọn nhân viên --</option>${options}`;
@@ -125,23 +126,23 @@ export const render = (container) => {
     resetSelect(positionSelect, '-- Chọn vị trí --', true);
     resetSelect(employeeSelect, '-- Chọn nhân viên --', true);
 
-    deptSelect.addEventListener('change', () => {
+    deptSelect.addEventListener('change', async () => {
         const deptVal = deptSelect.value;
         resetSelect(positionSelect, '-- Chọn vị trí --', true);
         resetSelect(employeeSelect, '-- Chọn nhân viên --', true);
         if (!deptVal) return;
-        populatePositions(Number(deptVal));
+        await populatePositions(Number(deptVal));
     });
-    positionSelect.addEventListener('change', () => {
+    positionSelect.addEventListener('change', async () => {
         const deptVal = deptSelect.value;
         const posVal = positionSelect.value;
         resetSelect(employeeSelect, '-- Chọn nhân viên --', true);
         if (!deptVal || !posVal) return;
-        populateEmployees(Number(deptVal), Number(posVal));
+        await populateEmployees(Number(deptVal), Number(posVal));
     });
-    const renderTable = () => {
+    const renderTable = async () => {
         const records = getAllRecords();
-        const currentEmployees = EmployeeDB.getAllEmployees();
+        const currentEmployees = await EmployeeDB.getAllEmployees();
         if (records.length === 0) {
             tableWrapper.innerHTML = '<p>Chưa có dữ liệu chấm công.</p>';
             return;
@@ -165,7 +166,7 @@ export const render = (container) => {
         );
         tableWrapper.innerHTML = tableHtml;
     };
-    form.addEventListener('submit', (event) => {
+    form.addEventListener('submit', async (event) => {
         event.preventDefault();
         const deptVal = deptSelect.value;
         const posVal = positionSelect.value;
@@ -177,8 +178,10 @@ export const render = (container) => {
             showAlert('Vui lòng chọn phòng ban, vị trí và nhân viên, cũng như điền đủ thông tin', 'error');
             return;
         }
-        const emp = EmployeeDB.getEmployeeById(employeeId);
-        if (!emp || emp.departmentId !== Number(deptVal) || emp.positionId !== Number(posVal)) {
+        const emp = await EmployeeDB.getEmployeeById(employeeId);
+        const empDeptId = emp?.departmentId || emp?.department_id;
+        const empPosId = emp?.positionId || emp?.position_id;
+        if (!emp || empDeptId !== Number(deptVal) || empPosId !== Number(posVal)) {
             showAlert('Nhân viên không thuộc phòng ban/ vị trí đã chọn', 'error');
             return;
         }
@@ -194,7 +197,7 @@ export const render = (container) => {
         resetSelect(positionSelect, '-- Chọn vị trí --', true);
         resetSelect(employeeSelect, '-- Chọn nhân viên --', true);
         showAlert('Đã lưu chấm công');
-        renderTable();
+        await renderTable();
     });
     tableWrapper.addEventListener('click', async (event) => {
         const button = event.target.closest('button[data-id]');
@@ -211,7 +214,7 @@ export const render = (container) => {
         }
         deleteRecord(id);
         showAlert('Đã xóa bản ghi');
-        renderTable();
+        await renderTable();
     });
-    renderTable();
+    await renderTable();
 };

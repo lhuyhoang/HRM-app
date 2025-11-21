@@ -1,0 +1,164 @@
+<div class="settings-page">
+    <div class="settings-header">
+        <h2>⚙️ Cài đặt hệ thống</h2>
+        <p class="settings-subtitle">Quản lý cấu hình và thông tin hệ thống</p>
+    </div>
+
+    <div class="settings-container">
+        <div class="settings-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-icon">👤</span>
+                    <h3>Thông tin tài khoản</h3>
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="profile-info">
+                    <div class="info-item">
+                        <label>Tên đầy đủ:</label>
+                        <span id="user-fullname">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Email:</label>
+                        <span id="user-email">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Tên đăng nhập:</label>
+                        <span id="user-username">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-icon">🔒</span>
+                    <h3>Đổi mật khẩu</h3>
+                </div>
+            </div>
+            <div class="section-content">
+                <form id="change-password-form" class="settings-form">
+                    <div class="form-group">
+                        <label for="current-password">Mật khẩu hiện tại</label>
+                        <input type="password" id="current-password" name="current-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-password">Mật khẩu mới</label>
+                        <input type="password" id="new-password" name="new-password" required minlength="6">
+                        <small>Tối thiểu 6 ký tự</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">Xác nhận mật khẩu mới</label>
+                        <input type="password" id="confirm-password" name="confirm-password" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Đổi mật khẩu</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-icon">📊</span>
+                    <h3>Thống kê hệ thống</h3>
+                </div>
+                <button class="btn-refresh" id="refresh-stats">
+                    <span>🔄</span> Làm mới
+                </button>
+            </div>
+            <div class="section-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="total-employees">-</div>
+                            <div class="stat-label">Tổng nhân viên</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🏢</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="total-departments">-</div>
+                            <div class="stat-label">Phòng ban</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💼</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="total-positions">-</div>
+                            <div class="stat-label">Chức vụ</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="total-attendance">-</div>
+                            <div class="stat-label">Điểm danh hôm nay</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-icon">💾</span>
+                    <h3>Quản lý dữ liệu</h3>
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="database-actions">
+                    <div class="action-item">
+                        <div class="action-info">
+                            <h4>Sao lưu dữ liệu</h4>
+                            <p>Tạo bản sao lưu toàn bộ dữ liệu hệ thống</p>
+                        </div>
+                        <button class="btn-secondary" id="backup-data">
+                            📥 Sao lưu
+                        </button>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-info">
+                            <h4>Xóa cache</h4>
+                            <p>Xóa dữ liệu cache và làm mới hệ thống</p>
+                        </div>
+                        <button class="btn-secondary" id="clear-cache">
+                            🗑️ Xóa cache
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-icon">ℹ️</span>
+                    <h3>Thông tin hệ thống</h3>
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="system-info">
+                    <div class="info-row">
+                        <span class="info-label">Phiên bản:</span>
+                        <span class="info-value">1.0.0</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Backend API:</span>
+                        <span class="info-value" id="api-status">Đang kiểm tra...</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Database:</span>
+                        <span class="info-value">MySQL</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Thời gian hoạt động:</span>
+                        <span class="info-value" id="system-uptime">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
