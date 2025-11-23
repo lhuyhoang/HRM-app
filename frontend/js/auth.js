@@ -25,7 +25,7 @@ export const logout = async () => {
 export const isAuthenticated = () => {
     return apiService.auth.isAuthenticated();
 };
-// Helper function to show alert in auth forms
+// Hàm tiện ích để hiển thị thông báo trong form xác thực
 const showAuthAlert = (message, type = 'error') => {
     const alertContainer = document.getElementById('auth-alert');
     if (!alertContainer) return;
@@ -40,7 +40,7 @@ const showAuthAlert = (message, type = 'error') => {
         </div>
     `;
 
-    // Auto hide after 5 seconds
+    // Tự động ẩn sau 5 giây
     setTimeout(() => {
         alertContainer.innerHTML = '';
     }, 5000);

@@ -209,7 +209,6 @@ header h1 {
     background-color: var(--secondary-color);
 }
 
-/* Submenu styles */
 #sidebar .has-submenu>.submenu-toggle {
     position: relative;
     font-weight: 500;
@@ -259,7 +258,6 @@ header h1 {
     overflow-y: auto;
 }
 
-/* Breadcrumb */
 .breadcrumb {
     display: flex;
     align-items: center;

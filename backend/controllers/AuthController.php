@@ -30,6 +30,8 @@ class AuthController extends BaseController
 
         $this->model->updateLastLogin($user['id']);
 
+        unset($user['password']);
+
         $token = JWTHandler::encode([
             'user_id' => $user['id'],
             'username' => $user['username']

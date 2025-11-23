@@ -1,8 +1,4 @@
-/**
- * @param {string[]} headers
- * @param {Object[]} data
- * @param {(row: Object) => string} rowRenderer
- */
+
 export const createTable = (headers, data, rowRenderer) => {
     const headerHTML = headers.map((header) => `<th>${header}</th>`).join('');
     const bodyHTML = data.map(rowRenderer).join('');

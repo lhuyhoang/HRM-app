@@ -12,13 +12,13 @@ const redirectToLogin = () => {
 };
 
 const initializeApp = () => {
-    // Check if user is already authenticated
+    // Kiểm tra nếu người dùng đã đăng nhập
     if (apiService.auth.isAuthenticated()) {
         redirectToDashboard();
         return;
     }
 
-    // Redirect to login page when clicking login buttons
+    // Chuyển hướng đến trang đăng nhập khi nhấp nút
     navLoginBtn?.addEventListener('click', (e) => {
         e.preventDefault();
         redirectToLogin();

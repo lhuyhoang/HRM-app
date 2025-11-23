@@ -1,7 +1,7 @@
 import { showAlert } from './uiHelpers.js?v=2';
 import apiService from './apiService.js?v=2';
 
-// Helper function to show alert in auth forms
+// Hàm tiện ích để hiển thị thông báo trong form xác thực
 const showAuthAlert = (message, type = 'error') => {
     const alertContainer = document.getElementById('auth-alert');
     if (!alertContainer) return;
@@ -16,7 +16,7 @@ const showAuthAlert = (message, type = 'error') => {
         </div>
     `;
 
-    // Auto hide after 5 seconds
+    // Tự động ẩn sau 5 giây
     setTimeout(() => {
         alertContainer.innerHTML = '';
     }, 5000);
@@ -24,7 +24,7 @@ const showAuthAlert = (message, type = 'error') => {
 
 export const render = async (container, onRegistered) => {
     try {
-        // Load register HTML from file
+        // Tải HTML đăng ký từ file
         const response = await fetch('frontend/pages/register.html');
         const html = await response.text();
         container.innerHTML = html;
@@ -33,7 +33,7 @@ export const render = async (container, onRegistered) => {
         const backBtn = container.querySelector('#register-back-btn');
         const gotoLoginLink = container.querySelector('#goto-login');
 
-        // Back button handler
+        // Xử lý nút quay lại
         if (backBtn) {
             backBtn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -43,7 +43,7 @@ export const render = async (container, onRegistered) => {
             });
         }
 
-        // "Already have an account" link handler
+        // Xử lý liên kết "Đã có tài khoản"
         if (gotoLoginLink) {
             gotoLoginLink.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -63,7 +63,7 @@ export const render = async (container, onRegistered) => {
             const submitBtn = form.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
 
-            // Validation
+            // Xác thực dữ liệu
             if (!fullName || !username || !password || !confirm) {
                 showAuthAlert('Please fill in all fields', 'error');
                 return;
@@ -84,19 +84,19 @@ export const render = async (container, onRegistered) => {
                 return;
             }
 
-            // Disable button and show loading
+            // Vô hiệu hóa nút và hiển thị đang tải
             submitBtn.innerHTML = 'Creating account<span class="auth-loading"></span>';
             submitBtn.disabled = true;
 
             try {
-                // Call register API
+                // Gọi API đăng ký
                 const response = await apiService.auth.register(username, password, fullName);
 
                 if (response.success) {
                     showAuthAlert('Registration successful! Redirecting...', 'success');
                     form.reset();
 
-                    // Auto redirect after 1.5 seconds
+                    // Tự động chuyển hướng sau 1.5 giây
                     setTimeout(() => {
                         if (typeof onRegistered === 'function') {
                             onRegistered();

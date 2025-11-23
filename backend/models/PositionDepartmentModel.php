@@ -5,9 +5,7 @@ class PositionDepartmentModel extends BaseModel
 {
     protected $table = 'position_departments';
 
-    /**
-     * Get all departments for a position
-     */
+    // Lấy danh sách phòng ban liên kết với vị trí
     public function getDepartmentsByPosition($positionId)
     {
         try {
@@ -23,9 +21,7 @@ class PositionDepartmentModel extends BaseModel
         }
     }
 
-    /**
-     * Add department to position
-     */
+    // Thêm phòng ban vào vị trí
     public function addDepartment($positionId, $departmentId)
     {
         try {
@@ -45,9 +41,7 @@ class PositionDepartmentModel extends BaseModel
         }
     }
 
-    /**
-     * Remove department from position
-     */
+    // Xóa phòng ban khỏi vị trí
     public function removeDepartment($positionId, $departmentId)
     {
         try {
@@ -64,9 +58,7 @@ class PositionDepartmentModel extends BaseModel
         }
     }
 
-    /**
-     * Check if department is linked to position
-     */
+    // Kiểm tra vị trí đã liên kết với phòng ban chưa
     public function isLinked($positionId, $departmentId)
     {
         try {

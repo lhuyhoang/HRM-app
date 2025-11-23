@@ -1,12 +1,11 @@
 <?php
 require_once __DIR__ . '/BaseModel.php';
+
 class EmployeeModel extends BaseModel
 {
     protected $table = 'employees';
-    /**
-     * Get all employees with related data
-     * @return array
-     */
+
+    // Lấy tất cả nhân viên kèm thông tin phòng ban và vị trí
     public function getAllWithDetails()
     {
         try {
@@ -26,11 +25,7 @@ class EmployeeModel extends BaseModel
         }
     }
 
-    /**
-     * Get employee by ID with details
-     * @param int $id
-     * @return array|false
-     */
+    // Lấy thông tin chi tiết nhân viên theo ID
     public function getByIdWithDetails($id)
     {
         try {
@@ -52,12 +47,7 @@ class EmployeeModel extends BaseModel
         }
     }
 
-    /**
-     * Search employees
-     * @param string $query
-     * @param array $fields
-     * @return array
-     */
+    // Tìm kiếm nhân viên theo từ khóa
     public function search($query, $fields = ['full_name', 'email', 'phone'])
     {
         try {
@@ -82,11 +72,7 @@ class EmployeeModel extends BaseModel
         }
     }
 
-    /**
-     * Get employees by department
-     * @param int $departmentId
-     * @return array
-     */
+    // Lấy nhân viên theo phòng ban
     public function getByDepartment($departmentId)
     {
         try {
@@ -104,11 +90,7 @@ class EmployeeModel extends BaseModel
         }
     }
 
-    /**
-     * Get employees by position
-     * @param int $positionId
-     * @return array
-     */
+    // Lấy nhân viên theo vị trí
     public function getByPosition($positionId)
     {
         try {
@@ -126,12 +108,7 @@ class EmployeeModel extends BaseModel
         }
     }
 
-    /**
-     * Get employees by department and position
-     * @param int $departmentId
-     * @param int $positionId
-     * @return array
-     */
+    // Lấy nhân viên theo phòng ban và vị trí
     public function getByDepartmentAndPosition($departmentId, $positionId)
     {
         try {
@@ -148,12 +125,7 @@ class EmployeeModel extends BaseModel
         }
     }
 
-    /**
-     * Check if email exists
-     * @param string $email
-     * @param int $excludeId
-     * @return bool
-     */
+    // Kiểm tra email đã tồn tại chưa
     public function emailExists($email, $excludeId = null)
     {
         try {

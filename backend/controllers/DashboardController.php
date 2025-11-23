@@ -12,7 +12,7 @@ class DashboardController extends BaseController
         $this->model = new DashboardModel();
     }
 
-    public function stats()
+    public function stats(): void
     {
         AuthMiddleware::require();
         try {
@@ -23,7 +23,7 @@ class DashboardController extends BaseController
         }
     }
 
-    public function distribution()
+    public function distribution(): void
     {
         AuthMiddleware::require();
         try {
@@ -34,7 +34,7 @@ class DashboardController extends BaseController
         }
     }
 
-    public function activities()
+    public function activities(): void
     {
         AuthMiddleware::require();
         try {

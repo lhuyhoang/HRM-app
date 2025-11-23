@@ -4,11 +4,7 @@ class PerformanceModel extends BaseModel
 {
     protected $table = 'performance_reviews';
 
-    /**
-     * Get all performance reviews with details
-     * @param array $filters 
-     * @return array
-     */
+    // Lấy danh sách đánh giá hiệu suất kèm thông tin nhân viên, phòng ban, vị trí
     public function getAllWithDetails($filters = [])
     {
         try {
@@ -61,13 +57,7 @@ class PerformanceModel extends BaseModel
         }
     }
 
-    /**
-     * Check if review exists for employee in period
-     * @param int $employeeId
-     * @param string $period
-     * @param int $excludeId
-     * @return bool
-     */
+    // Kiểm tra đã có đánh giá cho kỳ này chưa
     public function existsForPeriod($employeeId, $period, $excludeId = null)
     {
         try {
@@ -92,11 +82,7 @@ class PerformanceModel extends BaseModel
         }
     }
 
-    /**
-     * Get average rating for employee
-     * @param int $employeeId
-     * @return float
-     */
+    // Tính điểm đánh giá trung bình của nhân viên
     public function getAverageRating($employeeId)
     {
         try {
@@ -114,12 +100,7 @@ class PerformanceModel extends BaseModel
         }
     }
 
-    /**
-     * Get performance statistics by department
-     * @param int $departmentId
-     * @param string $period
-     * @return array
-     */
+    // Lấy thống kê đánh giá hiệu suất của phòng ban
     public function getDepartmentStats($departmentId, $period = null)
     {
         try {

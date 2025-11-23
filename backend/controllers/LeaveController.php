@@ -7,12 +7,13 @@ require_once __DIR__ . '/../utils/Validator.php';
 
 class LeaveController extends BaseController
 {
-
+    // Khởi tạo controller với model tương ứng
     public function __construct()
     {
         $this->model = new LeaveModel();
     }
 
+    // Lấy danh sách đơn xin nghỉ
     public function index()
     {
         AuthMiddleware::require();
@@ -25,10 +26,10 @@ class LeaveController extends BaseController
             ];
 
             $filters = array_filter($filters);
-            // Get all leave records with details
+            // Lấy tất cả đơn xin nghỉ với thông tin chi tiết
             $leaves = $this->model->getAllWithDetails();
 
-            // Apply filters if needed
+            // Áp dụng bộ lọc nếu có
             if (!empty($filters)) {
                 $leaves = array_filter($leaves, function ($record) use ($filters) {
                     foreach ($filters as $key => $value) {
@@ -45,6 +46,7 @@ class LeaveController extends BaseController
         }
     }
 
+    // Lấy thông tin đơn xin nghỉ theo ID
     public function show($id)
     {
         AuthMiddleware::require();
@@ -58,11 +60,13 @@ class LeaveController extends BaseController
         }
     }
 
+    // Tạo đơn xin nghỉ mới
     public function create()
     {
         AuthMiddleware::require();
         $data = $this->getRequestData();
 
+        // Xác thực dữ liệu bắt buộc
         $errors = Validator::required($data, ['employee_id', 'leave_type', 'start_date', 'end_date', 'reason']);
         if ($errors)
             Response::validationError($errors);
@@ -102,6 +106,7 @@ class LeaveController extends BaseController
         }
     }
 
+    // Cập nhật đơn xin nghỉ
     public function update($id)
     {
         AuthMiddleware::require();
@@ -144,6 +149,7 @@ class LeaveController extends BaseController
         }
     }
 
+    // Cập nhật trạng thái đơn xin nghỉ
     public function updateStatus($id)
     {
         AuthMiddleware::require();
@@ -166,6 +172,7 @@ class LeaveController extends BaseController
         }
     }
 
+    // Xóa đơn xin nghỉ
     public function delete($id)
     {
         AuthMiddleware::require();

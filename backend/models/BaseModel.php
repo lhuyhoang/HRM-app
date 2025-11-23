@@ -10,13 +10,7 @@ abstract class BaseModel
         $this->db = Database::getInstance()->getConnection();
     }
 
-    /**
-     * Get all records
-     * @param array $conditions Optional where conditions
-     * @param string $orderBy Optional order by clause
-     * @return array
-     */
-    public function getAll($conditions = [], $orderBy = null)
+    public function getAll(array $conditions = [], ?string $orderBy = null): array
     {
         try {
             $sql = "SELECT * FROM {$this->table}";
@@ -48,12 +42,7 @@ abstract class BaseModel
         }
     }
 
-    /**
-     * Get record by ID
-     * @param int $id
-     * @return array|false
-     */
-    public function getById($id)
+    public function getById($id): mixed
     {
         try {
             $sql = "SELECT * FROM {$this->table} WHERE {$this->primaryKey} = :id LIMIT 1";
@@ -66,17 +55,13 @@ abstract class BaseModel
         }
     }
 
-    /**
-     * Create new record
-     * @param array $data
-     * @return int Last insert ID
-     */
-    public function create($data)
+    public function create(array $data): string
     {
         try {
             $columns = array_keys($data);
             $placeholders = array_map(function ($col) {
-                return ":$col"; }, $columns);
+                return ":$col";
+            }, $columns);
 
             $sql = "INSERT INTO {$this->table} (" . implode(", ", $columns) . ") 
                     VALUES (" . implode(", ", $placeholders) . ")";
@@ -94,13 +79,7 @@ abstract class BaseModel
         }
     }
 
-    /**
-     * Update record by ID
-     * @param int $id
-     * @param array $data
-     * @return bool
-     */
-    public function update($id, $data)
+    public function update($id, array $data): bool
     {
         try {
             $setClauses = [];
@@ -124,12 +103,7 @@ abstract class BaseModel
         }
     }
 
-    /**
-     * Delete record by ID
-     * @param int $id
-     * @return bool
-     */
-    public function delete($id)
+    public function delete($id): bool
     {
         try {
             $sql = "DELETE FROM {$this->table} WHERE {$this->primaryKey} = :id";
@@ -141,12 +115,7 @@ abstract class BaseModel
         }
     }
 
-    /**
-     * Count records
-     * @param array $conditions Optional where conditions
-     * @return int
-     */
-    public function count($conditions = [])
+    public function count(array $conditions = []): int
     {
         try {
             $sql = "SELECT COUNT(*) as total FROM {$this->table}";
@@ -175,13 +144,7 @@ abstract class BaseModel
         }
     }
 
-    /**
-     * Execute custom query
-     * @param string $sql
-     * @param array $params
-     * @return array
-     */
-    protected function query($sql, $params = [])
+    protected function query(string $sql, array $params = []): array
     {
         try {
             $stmt = $this->db->prepare($sql);

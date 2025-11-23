@@ -7,13 +7,14 @@ require_once __DIR__ . '/../utils/Validator.php';
 
 class AttendanceController extends BaseController
 {
-
+    // Khởi tạo controller với model tương ứng
     public function __construct()
     {
         $this->model = new AttendanceModel();
     }
 
-    public function index()
+    // Lấy danh sách chấm công
+    public function index(): void
     {
         AuthMiddleware::require();
         try {
@@ -25,10 +26,10 @@ class AttendanceController extends BaseController
             ];
 
             $filters = array_filter($filters);
-            // Get all attendance records with details
+            // Lấy tất cả bản ghi chấm công với thông tin chi tiết
             $attendance = $this->model->getAllWithDetails();
 
-            // Apply filters if needed
+            // Áp dụng bộ lọc nếu có
             if (!empty($filters)) {
                 $attendance = array_filter($attendance, function ($record) use ($filters) {
                     foreach ($filters as $key => $value) {
@@ -45,7 +46,8 @@ class AttendanceController extends BaseController
         }
     }
 
-    public function show($id)
+    // Lấy thông tin chấm công theo ID
+    public function show($id): void
     {
         AuthMiddleware::require();
         try {
@@ -58,11 +60,13 @@ class AttendanceController extends BaseController
         }
     }
 
-    public function create()
+    // Tạo bản ghi chấm công mới
+    public function create(): void
     {
         AuthMiddleware::require();
         $data = $this->getRequestData();
 
+        // Xác thực dữ liệu bắt buộc
         $errors = Validator::required($data, ['employee_id', 'date', 'status']);
         if ($errors)
             Response::validationError($errors);
@@ -100,7 +104,8 @@ class AttendanceController extends BaseController
         }
     }
 
-    public function update($id)
+    // Cập nhật thông tin chấm công
+    public function update($id): void
     {
         AuthMiddleware::require();
         $data = $this->getRequestData();
@@ -132,7 +137,8 @@ class AttendanceController extends BaseController
         }
     }
 
-    public function delete($id)
+    // Xóa bản ghi chấm công
+    public function delete($id): void
     {
         AuthMiddleware::require();
 
@@ -148,7 +154,8 @@ class AttendanceController extends BaseController
         }
     }
 
-    public function summary($employeeId)
+    // Lấy thống kê chấm công theo nhân viên
+    public function summary($employeeId): void
     {
         AuthMiddleware::require();
 

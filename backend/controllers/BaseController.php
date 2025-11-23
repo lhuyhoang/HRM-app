@@ -3,62 +3,33 @@ abstract class BaseController
 {
     protected $model;
 
-    /**
-     * Get request method
-     * @return string
-     */
     protected function getRequestMethod()
     {
         return $_SERVER['REQUEST_METHOD'];
     }
 
-    /**
-     * Get request data from JSON body
-     * @return array
-     */
     protected function getRequestData()
     {
         $data = json_decode(file_get_contents('php://input'), true);
         return $data ?? [];
     }
 
-    /**
-     * Get query parameters
-     * @return array
-     */
     protected function getQueryParams()
     {
         return $_GET;
     }
 
-    /**
-     * Get URL parameter
-     * @param string $key
-     * @param mixed $default
-     * @return mixed
-     */
     protected function getParam($key, $default = null)
     {
         return $_GET[$key] ?? $default;
     }
 
-    /**
-     * Get route parameter (from parsed URL)
-     * @param int $index
-     * @return string|null
-     */
     protected function getRouteParam($index)
     {
         global $routeParams;
         return $routeParams[$index] ?? null;
     }
 
-    /**
-     * Validate required fields
-     * @param array $data
-     * @param array $required
-     * @return array|null
-     */
     protected function validateRequired($data, $required)
     {
         $errors = [];
@@ -70,11 +41,6 @@ abstract class BaseController
         return empty($errors) ? null : $errors;
     }
 
-    /**
-     * Sanitize input data
-     * @param array $data
-     * @return array
-     */
     protected function sanitizeData($data)
     {
         $sanitized = [];
@@ -88,10 +54,6 @@ abstract class BaseController
         return $sanitized;
     }
 
-    /**
-     * Get authenticated user ID from token
-     * @return int|null
-     */
     protected function getAuthUserId()
     {
         $headers = getallheaders();

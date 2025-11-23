@@ -1,24 +1,21 @@
 <?php
 require_once __DIR__ . '/BaseModel.php';
+
 class SalaryModel extends BaseModel
 {
     protected $table = 'salaries';
 
-    /**
-     * Get all salaries with employee and department info
-     * @param int $departmentId
-     * @return array
-     */
+    // Lấy tất cả bảng lương kèm thông tin nhân viên
     public function getAllWithDetails($departmentId = null)
     {
         try {
             $sql = "SELECT s.*, 
                            e.full_name as employee_name,
                            e.department_id,
+                           e.salary as base_salary,
                            d.name as department_name,
                            p.title as position_title,
-                           p.base_salary,
-                           (p.base_salary + s.bonus - s.deduction) as net_salary
+                           (e.salary + s.bonus - s.deduction) as net_salary
                     FROM {$this->table} s
                     INNER JOIN employees e ON s.employee_id = e.id
                     LEFT JOIN departments d ON e.department_id = d.id
@@ -41,18 +38,14 @@ class SalaryModel extends BaseModel
         }
     }
 
-    /**
-     * Get salary by employee ID
-     * @param int $employeeId
-     * @return array|false
-     */
+    // Lấy thông tin lương theo ID nhân viên
     public function getByEmployeeId($employeeId)
     {
         try {
             $sql = "SELECT s.*, 
                            e.full_name as employee_name,
-                           p.base_salary,
-                           (p.base_salary + s.bonus - s.deduction) as net_salary
+                           e.salary as base_salary,
+                           (e.salary + s.bonus - s.deduction) as net_salary
                     FROM {$this->table} s
                     INNER JOIN employees e ON s.employee_id = e.id
                     LEFT JOIN positions p ON e.position_id = p.id
@@ -68,12 +61,7 @@ class SalaryModel extends BaseModel
         }
     }
 
-    /**
-     * Update or create salary for employee
-     * @param int $employeeId
-     * @param array $data
-     * @return bool
-     */
+    // Cập nhật hoặc tạo mới bản ghi lương
     public function updateOrCreate($employeeId, $data)
     {
         try {
@@ -94,20 +82,16 @@ class SalaryModel extends BaseModel
         }
     }
 
-    /**
-     * Calculate total payroll
-     * @param int $departmentId
-     * @return array
-     */
+    // Tính tổng bảng lương
     public function calculateTotalPayroll($departmentId = null)
     {
         try {
             $sql = "SELECT 
                            COUNT(DISTINCT s.employee_id) as employee_count,
-                           SUM(p.base_salary) as total_base_salary,
+                           SUM(e.salary) as total_base_salary,
                            SUM(s.bonus) as total_bonus,
                            SUM(s.deduction) as total_deduction,
-                           SUM(p.base_salary + s.bonus - s.deduction) as total_net_salary
+                           SUM(e.salary + s.bonus - s.deduction) as total_net_salary
                     FROM {$this->table} s
                     INNER JOIN employees e ON s.employee_id = e.id
                     LEFT JOIN positions p ON e.position_id = p.id";

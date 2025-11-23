@@ -3,9 +3,6 @@ import apiService from './apiService.js';
 
 let systemStartTime = Date.now();
 
-/**
- * Load user profile information
- */
 const loadUserProfile = async () => {
     try {
         const response = await apiService.auth.verify();
@@ -26,47 +23,8 @@ const loadUserProfile = async () => {
     }
 };
 
-/**
- * Load system statistics
- */
-const loadSystemStats = async () => {
-    try {
-        // Get employees count
-        const employeesResponse = await apiService.employees.getAll();
-        const employeesCount = employeesResponse.success ? employeesResponse.data.length : 0;
-        const totalEmployeesEl = document.getElementById('total-employees');
-        if (totalEmployeesEl) totalEmployeesEl.textContent = employeesCount;
 
-        // Get departments count
-        const departmentsResponse = await apiService.departments.getAll();
-        const departmentsCount = departmentsResponse.success ? departmentsResponse.data.length : 0;
-        const totalDepartmentsEl = document.getElementById('total-departments');
-        if (totalDepartmentsEl) totalDepartmentsEl.textContent = departmentsCount;
 
-        // Get positions count
-        const positionsResponse = await apiService.positions.getAll();
-        const positionsCount = positionsResponse.success ? positionsResponse.data.length : 0;
-        const totalPositionsEl = document.getElementById('total-positions');
-        if (totalPositionsEl) totalPositionsEl.textContent = positionsCount;
-
-        // Get today's attendance count
-        const attendanceResponse = await apiService.attendance.getAll();
-        const today = new Date().toISOString().split('T')[0];
-        const todayAttendance = attendanceResponse.success
-            ? attendanceResponse.data.filter(a => a.date === today).length
-            : 0;
-        const totalAttendanceEl = document.getElementById('total-attendance');
-        if (totalAttendanceEl) totalAttendanceEl.textContent = todayAttendance;
-
-    } catch (error) {
-        console.error('Failed to load system stats:', error);
-        showAlert('Không thể tải thống kê hệ thống', 'error');
-    }
-};
-
-/**
- * Check API status
- */
 const checkApiStatus = async () => {
     const apiStatusEl = document.getElementById('api-status');
     if (!apiStatusEl) return;
@@ -83,9 +41,6 @@ const checkApiStatus = async () => {
     }
 };
 
-/**
- * Update system uptime
- */
 const updateUptime = () => {
     const uptimeElement = document.getElementById('system-uptime');
     if (!uptimeElement) return; // Guard clause if element not found
@@ -98,9 +53,6 @@ const updateUptime = () => {
     uptimeElement.textContent = `${hours}h ${minutes}m ${seconds}s`;
 };
 
-/**
- * Handle password change
- */
 const handlePasswordChange = async (event) => {
     event.preventDefault();
 
@@ -108,7 +60,7 @@ const handlePasswordChange = async (event) => {
     const newPassword = document.getElementById('new-password').value;
     const confirmPassword = document.getElementById('confirm-password').value;
 
-    // Validation
+    // Xác thực dữ liệu
     if (newPassword.length < 6) {
         showAlert('Mật khẩu mới phải có ít nhất 6 ký tự', 'error');
         return;
@@ -139,9 +91,6 @@ const handlePasswordChange = async (event) => {
     }
 };
 
-/**
- * Handle backup data
- */
 const handleBackupData = async () => {
     const confirmed = await showConfirm('Bạn có chắc muốn tạo bản sao lưu dữ liệu?');
     if (!confirmed) return;
@@ -149,7 +98,7 @@ const handleBackupData = async () => {
     try {
         showAlert('Đang tạo bản sao lưu...', 'info');
 
-        // Export all data
+        // Xuất tất cả dữ liệu
         const [employees, departments, positions, attendance, leaves, performance, salaries] = await Promise.all([
             apiService.employees.getAll(),
             apiService.departments.getAll(),
@@ -174,7 +123,7 @@ const handleBackupData = async () => {
             }
         };
 
-        // Create download link
+        // Tạo liên kết tải xuống
         const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -192,25 +141,22 @@ const handleBackupData = async () => {
     }
 };
 
-/**
- * Handle clear cache
- */
 const handleClearCache = async () => {
     const confirmed = await showConfirm('Bạn có chắc muốn xóa cache? Hệ thống sẽ tải lại dữ liệu.');
     if (!confirmed) return;
 
     try {
-        // Clear localStorage cache (except JWT token)
+        // Xóa cache localStorage (trừ JWT token)
         const token = localStorage.getItem('jwt_token');
         localStorage.clear();
         if (token) {
             localStorage.setItem('jwt_token', token);
         }
 
-        // Clear sessionStorage
+        // Xóa sessionStorage
         sessionStorage.clear();
 
-        // Reload stats
+        // Tải lại thống kê
         await loadSystemStats();
 
         showAlert('Đã xóa cache thành công');
@@ -220,11 +166,8 @@ const handleClearCache = async () => {
     }
 };
 
-/**
- * Initialize settings page
- */
 export const render = async (container) => {
-    // Load HTML template
+    // Tải mẫu HTML
     try {
         const response = await fetch('../pages/settings.html?v=1');
         const html = await response.text();
@@ -235,32 +178,19 @@ export const render = async (container) => {
         return;
     }
 
-    // Load user profile
+    // Tải thông tin người dùng
     await loadUserProfile();
 
-    // Load system stats
-    await loadSystemStats();
-
-    // Check API status
+    // Kiểm tra trạng thái API
     await checkApiStatus();
 
-    // Start uptime counter
+    // Bắt đầu đếm thời gian hoạt động
     setInterval(updateUptime, 1000);
     updateUptime();
 
-    // Event listeners
+    // Các sự kiện lắng nghe
     const changePasswordForm = container.querySelector('#change-password-form');
     changePasswordForm?.addEventListener('submit', handlePasswordChange);
-
-    const refreshStatsBtn = container.querySelector('#refresh-stats');
-    refreshStatsBtn?.addEventListener('click', async () => {
-        refreshStatsBtn.disabled = true;
-        refreshStatsBtn.innerHTML = '<span>⏳</span> Đang tải...';
-        await loadSystemStats();
-        refreshStatsBtn.disabled = false;
-        refreshStatsBtn.innerHTML = '<span>🔄</span> Làm mới';
-        showAlert('Đã làm mới thống kê');
-    });
 
     const backupBtn = container.querySelector('#backup-data');
     backupBtn?.addEventListener('click', handleBackupData);

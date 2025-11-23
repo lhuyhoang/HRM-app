@@ -1,14 +1,12 @@
 <?php
 require_once __DIR__ . '/BaseModel.php';
+
 class DashboardModel extends BaseModel
 {
     protected $table = null;
 
-    /**
-     * Get dashboard statistics
-     * @return array
-     */
-    public function getStats()
+    // Lấy thống kê tổng quan hệ thống
+    public function getStats(): array
     {
         try {
             $sql = "SELECT COUNT(*) as total FROM employees";
@@ -48,10 +46,8 @@ class DashboardModel extends BaseModel
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getDepartmentDistribution()
+    // Lấy phân bố nhân viên theo phòng ban
+    public function getDepartmentDistribution(): array
     {
         try {
             $sql = "SELECT d.name, COUNT(e.id) as employee_count
@@ -68,11 +64,8 @@ class DashboardModel extends BaseModel
         }
     }
 
-    /**
-     * @param int $limit
-     * @return array
-     */
-    public function getRecentActivities($limit = 10)
+    // Lấy danh sách hoạt động gần đây
+    public function getRecentActivities(int $limit = 10): array
     {
         try {
             $activities = [];

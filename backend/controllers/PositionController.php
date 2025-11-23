@@ -10,12 +10,14 @@ class PositionController extends BaseController
 {
     private $pdModel;
 
+    // Khởi tạo controller với các model
     public function __construct()
     {
         $this->model = new PositionModel();
         $this->pdModel = new PositionDepartmentModel();
     }
 
+    // Lấy danh sách vị trí
     public function index()
     {
         AuthMiddleware::require();
@@ -32,6 +34,7 @@ class PositionController extends BaseController
         }
     }
 
+    // Lấy thông tin vị trí theo ID
     public function show($id)
     {
         AuthMiddleware::require();
@@ -45,11 +48,13 @@ class PositionController extends BaseController
         }
     }
 
+    // Tạo vị trí mới
     public function create()
     {
         AuthMiddleware::require();
         $data = $this->getRequestData();
 
+        // Xác thực dữ liệu bắt buộc
         $errors = Validator::required($data, ['title']);
         if ($errors)
             Response::validationError($errors);
@@ -82,6 +87,7 @@ class PositionController extends BaseController
         }
     }
 
+    // Cập nhật thông tin vị trí
     public function update($id)
     {
         AuthMiddleware::require();
@@ -91,7 +97,7 @@ class PositionController extends BaseController
         if (!$existing)
             Response::notFound('Position not found');
 
-        // Chỉ validate title và base_salary, department_id giữ nguyên từ existing
+        // Xác thực tiêu đề và lương cơ bản
         $errors = Validator::required($data, ['title', 'base_salary']);
         if ($errors)
             Response::validationError($errors);
@@ -101,10 +107,10 @@ class PositionController extends BaseController
             Response::error('Base salary must be non-negative');
         }
 
-        // Sử dụng department_id từ data nếu có, nếu không thì giữ nguyên
+        // Sử dụng department_id từ dữ liệu mới hoặc giữ nguyên từ bản ghi cũ
         $departmentId = isset($data['department_id']) ? $data['department_id'] : $existing['department_id'];
 
-        // Chỉ kiểm tra trùng title nếu department_id có giá trị
+        // Kiểm tra trùng tiêu đề trong cùng phòng ban
         if ($departmentId && $this->model->titleExists($data['title'], $departmentId, $id)) {
             Response::error('Position title already exists in this department', 409);
         }
@@ -126,6 +132,7 @@ class PositionController extends BaseController
         }
     }
 
+    // Xóa vị trí
     public function delete($id)
     {
         AuthMiddleware::require();
@@ -150,17 +157,14 @@ class PositionController extends BaseController
         }
     }
 
-    /**
-     * Add department to position
-     */
+    // Thêm phòng ban vào vị trí
     public function addDepartmentToPosition($positionId, $departmentId)
     {
-        // Log for debugging
         error_log("addDepartmentToPosition called with posId: $positionId, deptId: $departmentId");
 
         AuthMiddleware::require();
 
-        // Validate input
+        // Xác thực dữ liệu đầu vào
         if (!is_numeric($positionId) || !is_numeric($departmentId)) {
             error_log("Invalid input - posId: " . var_export($positionId, true) . ", deptId: " . var_export($departmentId, true));
             Response::error('Invalid position or department ID', 400);
@@ -170,13 +174,13 @@ class PositionController extends BaseController
         $departmentId = (int) $departmentId;
 
         try {
-            // Verify position exists
+            // Kiểm tra vị trí có tồn tại
             $position = $this->model->getById($positionId);
             if (!$position) {
                 Response::notFound('Position not found');
             }
 
-            // Verify department exists
+            // Kiểm tra phòng ban có tồn tại
             require_once __DIR__ . '/../models/DepartmentModel.php';
             $deptModel = new DepartmentModel();
             $department = $deptModel->getById($departmentId);
@@ -184,7 +188,7 @@ class PositionController extends BaseController
                 Response::notFound('Department not found');
             }
 
-            // Check if already linked
+            // Kiểm tra đã liên kết chưa
             if ($this->pdModel->isLinked($positionId, $departmentId)) {
                 Response::error(
                     "Phòng ban '{$department['name']}' đã được gán cho vị trí '{$position['title']}' rồi.",
@@ -192,10 +196,10 @@ class PositionController extends BaseController
                 );
             }
 
-            // Add the link
+            // Thêm liên kết
             $this->pdModel->addDepartment($positionId, $departmentId);
 
-            // Return updated position with departments
+            // Trả về vị trí đã cập nhật
             $position = $this->model->getById($positionId);
             $position['additional_departments'] = $this->pdModel->getDepartmentsByPosition($positionId);
 
@@ -205,29 +209,27 @@ class PositionController extends BaseController
         }
     }
 
-    /**
-     * Remove department from position
-     */
+    // Xóa phòng ban khỏi vị trí
     public function removeDepartmentFromPosition($positionId, $departmentId)
     {
         AuthMiddleware::require();
 
         try {
-            // Verify position exists
+            // Kiểm tra vị trí có tồn tại
             $position = $this->model->getById($positionId);
             if (!$position) {
                 Response::notFound('Position not found');
             }
 
-            // Check if linked
+            // Kiểm tra đã liên kết chưa
             if (!$this->pdModel->isLinked($positionId, $departmentId)) {
                 Response::notFound('Department not linked to this position');
             }
 
-            // Remove the link
+            // Xóa liên kết
             $this->pdModel->removeDepartment($positionId, $departmentId);
 
-            // Return updated position with departments
+            // Trả về vị trí đã cập nhật
             $position = $this->model->getById($positionId);
             $position['additional_departments'] = $this->pdModel->getDepartmentsByPosition($positionId);
 

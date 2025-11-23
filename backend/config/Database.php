@@ -25,10 +25,6 @@ class Database
         }
     }
 
-    /**
-     * Get Database instance
-     * @return Database
-     */
     public static function getInstance()
     {
         if (self::$instance === null) {
@@ -37,10 +33,6 @@ class Database
         return self::$instance;
     }
 
-    /**
-     * Get PDO connection
-     * @return PDO
-     */
     public function getConnection()
     {
         return $this->conn;

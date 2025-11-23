@@ -1,5 +1,3 @@
-/* Settings Page Styles */
-
 .settings-page {
     padding: 2rem;
     max-width: 1200px;
@@ -27,7 +25,6 @@
     gap: 1.5rem;
 }
 
-/* Settings Section */
 .settings-section {
     background: white;
     border-radius: 12px;
@@ -88,7 +85,6 @@
     padding: 1.5rem;
 }
 
-/* Profile Info */
 .profile-info {
     display: flex;
     flex-direction: column;
@@ -111,7 +107,6 @@
     color: #6b7280;
 }
 
-/* Settings Form */
 .settings-form {
     max-width: 500px;
 }
@@ -181,7 +176,6 @@
     border-color: #9ca3af;
 }
 
-/* Stats Grid */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -220,7 +214,6 @@
     color: #6b7280;
 }
 
-/* Database Actions */
 .database-actions {
     display: flex;
     flex-direction: column;
@@ -249,7 +242,6 @@
     margin: 0;
 }
 
-/* System Info */
 .system-info {
     display: flex;
     flex-direction: column;
@@ -277,7 +269,6 @@
     color: #6b7280;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     .settings-page {
         padding: 1rem;

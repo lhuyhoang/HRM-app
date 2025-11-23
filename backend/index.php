@@ -10,15 +10,12 @@ require_once __DIR__ . '/utils/Validator.php';
 require_once __DIR__ . '/middleware/AuthMiddleware.php';
 
 Config::init();
-// lấy HTTP method và URI
 $method = $_SERVER['REQUEST_METHOD'];
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-// Loại bỏ base path nếu có
 $basePath = '/hrmapp/backend';
 if (strpos($uri, $basePath) === 0) {
     $uri = substr($uri, strlen($basePath));
 }
-// Phân tích URI
 $uri = trim($uri, '/');
 $parts = explode('/', $uri);
 $routeParams = [];
@@ -26,7 +23,6 @@ try {
     if (!isset($parts[0]) || $parts[0] !== 'api') {
         Response::notFound('Invalid API endpoint');
     }
-    // Phân tích resource, id, action
     $resource = $parts[1] ?? null;
     $id = isset($parts[2]) && is_numeric($parts[2]) ? (int) $parts[2] : null;
     $action = $id ? ($parts[3] ?? null) : ($parts[2] ?? null);
@@ -89,13 +85,10 @@ try {
             require_once __DIR__ . '/controllers/PositionController.php';
             $controller = new PositionController();
 
-            // Route: POST /api/positions/{id}/departments/{deptId}
             if ($method === 'POST' && $id && $action === 'departments' && isset($parts[4]) && is_numeric($parts[4])) {
                 $deptId = (int) $parts[4];
                 $controller->addDepartmentToPosition($id, $deptId);
-            }
-            // Route: DELETE /api/positions/{id}/departments/{deptId}
-            elseif ($method === 'DELETE' && $id && $action === 'departments' && isset($parts[4]) && is_numeric($parts[4])) {
+            } elseif ($method === 'DELETE' && $id && $action === 'departments' && isset($parts[4]) && is_numeric($parts[4])) {
                 $deptId = (int) $parts[4];
                 $controller->removeDepartmentFromPosition($id, $deptId);
             } elseif ($method === 'GET' && $id) {
@@ -142,12 +135,18 @@ try {
                 $controller->payroll();
             } elseif ($action === 'employee' && $method === 'GET' && isset($parts[3])) {
                 $controller->getByEmployee($parts[3]);
+            } elseif ($action === 'status' && $method === 'PUT' && $id) {
+                $controller->updateStatus($id);
             } elseif ($method === 'GET' && $id) {
                 $controller->show($id);
             } elseif ($method === 'GET') {
                 $controller->index();
+            } elseif ($method === 'POST') {
+                $controller->create();
             } elseif ($method === 'PUT' && $id) {
                 $controller->update($id);
+            } elseif ($method === 'DELETE' && $id) {
+                $controller->delete($id);
             } else {
                 Response::notFound('Salary endpoint not found');
             }

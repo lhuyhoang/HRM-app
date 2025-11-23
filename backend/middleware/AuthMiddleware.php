@@ -1,10 +1,6 @@
 <?php
 class AuthMiddleware
 {
-    /**
-     * Verify authentication token
-     * @return array|false User data if authenticated, false otherwise
-     */
     public static function authenticate()
     {
         $headers = getallheaders();
@@ -32,11 +28,6 @@ class AuthMiddleware
         return $payload;
     }
 
-    /**
-     * Require authentication
-     * Exits if not authenticated
-     * @return array User data
-     */
     public static function require()
     {
         $user = self::authenticate();
@@ -46,11 +37,6 @@ class AuthMiddleware
         return $user;
     }
 
-    /**
-     * Optional authentication
-     * Returns user data if authenticated, null otherwise
-     * @return array|null
-     */
     public static function optional()
     {
         $headers = getallheaders();

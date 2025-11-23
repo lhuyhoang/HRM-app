@@ -17,7 +17,7 @@
         <div id="main-dashboard">
             <header>
                 <h1>HRM Dashboard</h1>
-                <button id="logout-btn">Đăng xuất</button>
+                <button id="logout-btn">Logout</button>
             </header>
             <div class="dashboard-body">
                 <nav id="sidebar">
@@ -34,7 +34,13 @@
                                 <li><a href="#" data-module="performance">Performance</a></li>
                             </ul>
                         </li>
-                        <li><a href="#" data-module="salary">Salary Management</a></li>
+                        <li class="has-submenu">
+                            <a href="#" class="submenu-toggle">Salary Management</a>
+                            <ul class="submenu">
+                                <li><a href="#" data-module="salary-payroll">Payroll</a></li>
+                                <li><a href="#" data-module="salary-payment">Salary Payment</a></li>
+                            </ul>
+                        </li>
                         <li><a href="#" data-module="attendance">Attendance</a></li>
                         <li><a href="#" data-module="settings">Settings</a></li>
                     </ul>

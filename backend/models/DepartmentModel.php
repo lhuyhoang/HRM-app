@@ -5,11 +5,8 @@ class DepartmentModel extends BaseModel
 {
     protected $table = 'departments';
 
-    /**
-     * Get all departments with employee count
-     * @return array
-     */
-    public function getAllWithStats()
+    // Lấy tất cả phòng ban kèm thống kê số lượng nhân viên
+    public function getAllWithStats(): array
     {
         try {
             $sql = "SELECT d.*, 
@@ -27,13 +24,8 @@ class DepartmentModel extends BaseModel
         }
     }
 
-    /**
-     * Check if department name exists
-     * @param string $name
-     * @param int $excludeId Optional ID to exclude (for updates)
-     * @return bool
-     */
-    public function nameExists($name, $excludeId = null)
+    // Kiểm tra tên phòng ban đã tồn tại chưa
+    public function nameExists(string $name, $excludeId = null): bool
     {
         try {
             $sql = "SELECT COUNT(*) as count FROM {$this->table} WHERE name = :name";
@@ -55,15 +47,11 @@ class DepartmentModel extends BaseModel
         }
     }
 
-    /**
-     * Check if department can be deleted
-     * @param int $id
-     * @return array Returns ['canDelete' => bool, 'reason' => string]
-     */
-    public function canDelete($id)
+    // Kiểm tra có thể xóa phòng ban hay không (không có nhân viên hoặc vị trí)
+    public function canDelete($id): array
     {
         try {
-            // Check for employees
+            // Kiểm tra có nhân viên trong phòng ban không
             $sql = "SELECT COUNT(*) as count FROM employees WHERE department_id = :id";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':id', $id, PDO::PARAM_INT);
@@ -77,7 +65,7 @@ class DepartmentModel extends BaseModel
                 ];
             }
 
-            // Check for positions
+            // Kiểm tra có vị trí trong phòng ban không
             $sql = "SELECT COUNT(*) as count FROM positions WHERE department_id = :id";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':id', $id, PDO::PARAM_INT);

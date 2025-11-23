@@ -1,22 +1,11 @@
 <?php
-/**
- * JWT Handler for Authentication
- * Simple JWT implementation for token generation and validation
- */
 class JWTHandler
 {
-    /**
-     * Encode payload to JWT token
-     * @param array $payload
-     * @return string
-     */
     public static function encode($payload)
     {
-        // Add issued at and expiration time
         $payload['iat'] = time();
         $payload['exp'] = time() + Config::JWT_EXPIRATION;
 
-        // Create header
         $header = [
             'typ' => 'JWT',
             'alg' => Config::JWT_ALGORITHM
@@ -36,11 +25,6 @@ class JWTHandler
         return "$headerEncoded.$payloadEncoded.$signatureEncoded";
     }
 
-    /**
-     * Decode and validate JWT token
-     * @param string $token
-     * @return array|false
-     */
     public static function decode($token)
     {
         try {
@@ -75,21 +59,11 @@ class JWTHandler
         }
     }
 
-    /**
-     * Base64 URL encode
-     * @param string $data
-     * @return string
-     */
     private static function base64UrlEncode($data)
     {
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 
-    /**
-     * Base64 URL decode
-     * @param string $data
-     * @return string
-     */
     private static function base64UrlDecode($data)
     {
         return base64_decode(strtr($data, '-_', '+/'));

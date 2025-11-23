@@ -149,6 +149,7 @@ const apiService = {
         })
     },
     salaries: {
+        getAll: () => fetchAPI('/salaries'),
         getByEmployee: (employeeId) => fetchAPI(`/salaries/employee/${employeeId}`),
         create: (salaryData) => fetchAPI('/salaries', {
             method: 'POST',
@@ -157,6 +158,13 @@ const apiService = {
         update: (id, salaryData) => fetchAPI(`/salaries/${id}`, {
             method: 'PUT',
             body: JSON.stringify(salaryData)
+        }),
+        updateStatus: (id, status) => fetchAPI(`/salaries/${id}/status`, {
+            method: 'PUT',
+            body: JSON.stringify({ payment_status: status })
+        }),
+        delete: (id) => fetchAPI(`/salaries/${id}`, {
+            method: 'DELETE'
         })
     },
     attendance: {

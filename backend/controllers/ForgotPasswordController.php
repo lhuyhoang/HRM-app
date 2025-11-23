@@ -6,16 +6,14 @@ class ForgotPasswordController
 {
     private $db;
 
+    // Khởi tạo controller với kết nối database
     public function __construct()
     {
         $this->db = Database::getInstance()->getConnection();
     }
 
-    /**
-     * Request password reset
-     * Gửi link reset password qua email (hoặc trả về token để test)
-     */
-    public function requestReset()
+    // Yêu cầu đặt lại mật khẩu
+    public function requestReset(): void
     {
         try {
             $data = json_decode(file_get_contents('php://input'), true);
@@ -31,7 +29,7 @@ class ForgotPasswordController
 
             $identifier = trim($data['identifier']);
 
-            // Tìm user theo username hoặc email
+            // Tìm người dùng theo tên đăng nhập hoặc email
             $query = "SELECT user_id, username, full_name, email FROM users 
                      WHERE username = :identifier OR email = :identifier 
                      LIMIT 1";
@@ -67,18 +65,9 @@ class ForgotPasswordController
             $updateStmt->bindParam(':user_id', $user['user_id']);
             $updateStmt->execute();
 
-            // TODO: Gửi email với reset link
-            // Trong production, sử dụng PHPMailer hoặc SMTP service
-            // $resetLink = "http://localhost/hrmapp/frontend/pages/reset-password.html?token=" . $resetToken;
-            // sendEmail($user['email'], 'Password Reset', $resetLink);
-
-            // Trả về thông báo thành công (trong production không trả về token)
             echo json_encode([
                 'success' => true,
-                'message' => 'If this account exists, a password reset link will be sent to the registered email.',
-                // Chỉ để test, xóa dòng này trong production
-                'debug_token' => $resetToken,
-                'debug_link' => "/hrmapp/frontend/pages/reset-password.html?token=" . $resetToken
+                'message' => 'If this account exists, a password reset link will be sent to the registered email.'
             ]);
 
         } catch (PDOException $e) {
@@ -91,11 +80,8 @@ class ForgotPasswordController
         }
     }
 
-    /**
-     * Verify reset token
-     * Kiểm tra token có hợp lệ và chưa hết hạn
-     */
-    public function verifyToken($token)
+    // Xác thực token đặt lại mật khẩu
+    public function verifyToken(string $token): void
     {
         try {
             $query = "SELECT user_id, username, full_name 
@@ -138,11 +124,8 @@ class ForgotPasswordController
         }
     }
 
-    /**
-     * Reset password
-     * Đặt lại mật khẩu mới
-     */
-    public function resetPassword()
+    // Đặt lại mật khẩu với token
+    public function resetPassword(): void
     {
         try {
             $data = json_decode(file_get_contents('php://input'), true);
@@ -219,15 +202,14 @@ class ForgotPasswordController
             ]);
         }
     }
-    public function resetPasswordSimple()
+
+    // Đặt lại mật khẩu đơn giản (không dùng token)
+    public function resetPasswordSimple(): void
     {
-        error_log("resetPasswordSimple called");
         try {
             $data = json_decode(file_get_contents('php://input'), true);
-            error_log("Received data: " . print_r($data, true));
 
             if (!isset($data['identifier']) || !isset($data['password'])) {
-                error_log("Missing identifier or password");
                 http_response_code(400);
                 echo json_encode([
                     'success' => false,
@@ -254,15 +236,11 @@ class ForgotPasswordController
                      WHERE username = :identifier 
                      LIMIT 1";
 
-            error_log("Query: " . $query);
-            error_log("Identifier: " . $identifier);
-
             $stmt = $this->db->prepare($query);
             $stmt->bindParam(':identifier', $identifier);
             $stmt->execute();
 
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            error_log("User found: " . print_r($user, true));
 
             if (!$user) {
                 http_response_code(400);

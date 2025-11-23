@@ -1,14 +1,11 @@
 <?php
 require_once __DIR__ . '/BaseModel.php';
+
 class UserModel extends BaseModel
 {
     protected $table = 'users';
 
-    /**
-     * Find user by username
-     * @param string $username
-     * @return array|false
-     */
+    // Tìm người dùng theo tên đăng nhập
     public function findByUsername($username)
     {
         try {
@@ -22,11 +19,7 @@ class UserModel extends BaseModel
         }
     }
 
-    /**
-     * Find user by username or email
-     * @param string $identifier Username or email
-     * @return array|false
-     */
+    // Tìm người dùng theo tên đăng nhập hoặc email
     public function findByUsernameOrEmail($identifier)
     {
         try {
@@ -41,14 +34,10 @@ class UserModel extends BaseModel
         }
     }
 
-    /**
-     * Create new user with hashed password
-     * @param array $data
-     * @return int User ID
-     */
+    // Tạo người dùng mới với mật khẩu đã mã hóa
     public function createUser($data)
     {
-        // Hash password
+        // Mã hóa mật khẩu
         if (isset($data['password'])) {
             $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
         }
@@ -58,12 +47,7 @@ class UserModel extends BaseModel
         return $this->create($data);
     }
 
-    /**
-     * Verify user password
-     * @param string $identifier Username or email
-     * @param string $password
-     * @return array|false User data if valid, false otherwise
-     */
+    // Xác thực thông tin đăng nhập
     public function verifyCredentials($identifier, $password)
     {
         $user = $this->findByUsernameOrEmail($identifier);
@@ -72,8 +56,8 @@ class UserModel extends BaseModel
             return false;
         }
 
+        // Kiểm tra mật khẩu
         if (password_verify($password, $user['password'])) {
-            // Remove password from returned data
             unset($user['password']);
             return $user;
         }
@@ -81,21 +65,13 @@ class UserModel extends BaseModel
         return false;
     }
 
-    /**
-     * Check if username exists
-     * @param string $username
-     * @return bool
-     */
+    // Kiểm tra tên đăng nhập đã tồn tại chưa
     public function usernameExists($username)
     {
         return $this->findByUsername($username) !== false;
     }
 
-    /**
-     * Update last login time
-     * @param int $userId
-     * @return bool
-     */
+    // Cập nhật thời gian đăng nhập cuối
     public function updateLastLogin($userId)
     {
         return $this->update($userId, [

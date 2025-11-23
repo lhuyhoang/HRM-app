@@ -1,6 +1,4 @@
-/**
- * Position Management Module with API Integration
- */
+
 import * as DeptDB from './department.js';
 import { createTable, showAlert, showConfirm } from './uiHelpers.js';
 import apiService from './apiService.js';

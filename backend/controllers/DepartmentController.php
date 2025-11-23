@@ -13,7 +13,7 @@ class DepartmentController extends BaseController
         $this->model = new DepartmentModel();
     }
 
-    public function index()
+    public function index(): void
     {
         AuthMiddleware::require();
 
@@ -25,7 +25,7 @@ class DepartmentController extends BaseController
         }
     }
 
-    public function show($id)
+    public function show($id): void
     {
         AuthMiddleware::require();
 
@@ -40,7 +40,7 @@ class DepartmentController extends BaseController
         }
     }
 
-    public function create()
+    public function create(): void
     {
         AuthMiddleware::require();
 
@@ -70,7 +70,7 @@ class DepartmentController extends BaseController
         }
     }
 
-    public function update($id)
+    public function update($id): void
     {
         AuthMiddleware::require();
 
@@ -105,7 +105,7 @@ class DepartmentController extends BaseController
         }
     }
 
-    public function delete($id)
+    public function delete($id): void
     {
         AuthMiddleware::require();
 

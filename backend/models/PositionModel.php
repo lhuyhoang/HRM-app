@@ -4,10 +4,7 @@ class PositionModel extends BaseModel
 {
     protected $table = 'positions';
 
-    /**
-     * Get all positions with department info
-     * @return array
-     */
+    // Lấy tất cả vị trí kèm thông tin phòng ban và số lượng nhân viên
     public function getAllWithDepartment()
     {
         try {
@@ -23,7 +20,6 @@ class PositionModel extends BaseModel
             $stmt->execute();
             $positions = $stmt->fetchAll();
 
-            // Add additional departments for each position
             require_once __DIR__ . '/PositionDepartmentModel.php';
             $pdModel = new PositionDepartmentModel();
 
@@ -37,11 +33,7 @@ class PositionModel extends BaseModel
         }
     }
 
-    /**
-     * Get positions by department
-     * @param int $departmentId
-     * @return array
-     */
+    // Lấy danh sách vị trí theo phòng ban
     public function getByDepartment($departmentId)
     {
         try {
@@ -57,13 +49,7 @@ class PositionModel extends BaseModel
             throw new Exception("Error fetching positions: " . $e->getMessage());
         }
     }
-    /**
-     * Check if position title exists in department
-     * @param string $title
-     * @param int $departmentId
-     * @param int $excludeId
-     * @return bool
-     */
+    // Kiểm tra tên vị trí đã tồn tại trong phòng ban chưa
     public function titleExists($title, $departmentId, $excludeId = null)
     {
         try {
@@ -86,11 +72,7 @@ class PositionModel extends BaseModel
         }
     }
 
-    /**
-     * Check if position can be deleted
-     * @param int $id
-     * @return bool
-     */
+    // Kiểm tra có thể xóa vị trí hay không (không có nhân viên)
     public function canDelete($id)
     {
         try {
@@ -105,11 +87,7 @@ class PositionModel extends BaseModel
         }
     }
 
-    /**
-     * Get employee count for a position
-     * @param int $id
-     * @return int
-     */
+    // Đếm số lượng nhân viên trong vị trí
     public function getEmployeeCount($id)
     {
         try {

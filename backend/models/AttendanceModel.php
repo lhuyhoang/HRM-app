@@ -5,12 +5,8 @@ class AttendanceModel extends BaseModel
 {
     protected $table = 'attendance';
 
-    /**
-     * Get all attendance records with details
-     * @param array $filters Optional filters (department_id, position_id, date)
-     * @return array
-     */
-    public function getAllWithDetails($filters = [])
+    // Lấy danh sách chấm công kèm thông tin nhân viên, phòng ban, vị trí
+    public function getAllWithDetails(array $filters = []): array
     {
         try {
             $sql = "SELECT a.*, 
@@ -62,14 +58,8 @@ class AttendanceModel extends BaseModel
         }
     }
 
-    /**
-     * Check if attendance exists for employee on date
-     * @param int $employeeId
-     * @param string $date
-     * @param int $excludeId Optional ID to exclude (for updates)
-     * @return bool
-     */
-    public function existsForDate($employeeId, $date, $excludeId = null)
+    // Kiểm tra bản ghi chấm công đã tồn tại cho ngày này chưa
+    public function existsForDate($employeeId, string $date, $excludeId = null): bool
     {
         try {
             $sql = "SELECT COUNT(*) as count FROM {$this->table} 
@@ -93,14 +83,8 @@ class AttendanceModel extends BaseModel
         }
     }
 
-    /**
-     * Get attendance summary for employee
-     * @param int $employeeId
-     * @param string $startDate
-     * @param string $endDate
-     * @return array
-     */
-    public function getSummary($employeeId, $startDate, $endDate)
+    // Lấy thống kê chấm công của nhân viên trong khoảng thời gian
+    public function getSummary($employeeId, string $startDate, string $endDate): mixed
     {
         try {
             $sql = "SELECT 

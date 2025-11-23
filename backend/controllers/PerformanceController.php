@@ -7,12 +7,13 @@ require_once __DIR__ . '/../utils/Validator.php';
 
 class PerformanceController extends BaseController
 {
-
+    // Khởi tạo controller với model tương ứng
     public function __construct()
     {
         $this->model = new PerformanceModel();
     }
 
+    // Lấy danh sách đánh giá hiệu suất
     public function index()
     {
         AuthMiddleware::require();
@@ -25,10 +26,10 @@ class PerformanceController extends BaseController
             ];
 
             $filters = array_filter($filters);
-            // Get all performance reviews with details
+            // Lấy tất cả đánh giá hiệu suất với thông tin chi tiết
             $reviews = $this->model->getAllWithDetails();
 
-            // Apply filters if needed
+            // Áp dụng bộ lọc nếu có
             if (!empty($filters)) {
                 $reviews = array_filter($reviews, function ($record) use ($filters) {
                     foreach ($filters as $key => $value) {
@@ -45,6 +46,7 @@ class PerformanceController extends BaseController
         }
     }
 
+    // Lấy thông tin đánh giá theo ID
     public function show($id)
     {
         AuthMiddleware::require();
@@ -58,11 +60,13 @@ class PerformanceController extends BaseController
         }
     }
 
+    // Tạo đánh giá hiệu suất mới
     public function create()
     {
         AuthMiddleware::require();
         $data = $this->getRequestData();
 
+        // Xác thực dữ liệu bắt buộc
         $errors = Validator::required($data, ['employee_id', 'review_period', 'rating', 'category']);
         if ($errors)
             Response::validationError($errors);
@@ -97,6 +101,7 @@ class PerformanceController extends BaseController
         }
     }
 
+    // Cập nhật đánh giá hiệu suất
     public function update($id)
     {
         AuthMiddleware::require();
@@ -130,6 +135,7 @@ class PerformanceController extends BaseController
         }
     }
 
+    // Xóa đánh giá hiệu suất
     public function delete($id)
     {
         AuthMiddleware::require();
@@ -146,6 +152,7 @@ class PerformanceController extends BaseController
         }
     }
 
+    // Tính điểm trung bình của nhân viên
     public function averageRating($employeeId)
     {
         AuthMiddleware::require();

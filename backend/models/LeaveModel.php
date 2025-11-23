@@ -4,11 +4,7 @@ class LeaveModel extends BaseModel
 {
     protected $table = 'leaves';
 
-    /**
-     * Get all leave requests with details
-     * @param array $filters 
-     * @return array
-     */
+    // Lấy danh sách đơn xin nghỉ kèm thông tin nhân viên, phòng ban, vị trí
     public function getAllWithDetails($filters = [])
     {
         try {
@@ -56,12 +52,7 @@ class LeaveModel extends BaseModel
             throw new Exception("Error fetching leave requests: " . $e->getMessage());
         }
     }
-    /**
-     * Update leave status
-     * @param int $id
-     * @param string $status
-     * @return bool
-     */
+    // Cập nhật trạng thái đơn xin nghỉ
     public function updateStatus($id, $status)
     {
         return $this->update($id, [
@@ -69,14 +60,7 @@ class LeaveModel extends BaseModel
             'updated_at' => date('Y-m-d H:i:s')
         ]);
     }
-    /**
-     * Check for overlapping leave requests
-     * @param int $employeeId
-     * @param string $startDate
-     * @param string $endDate
-     * @param int $excludeId
-     * @return bool
-     */
+    // Kiểm tra có đơn xin nghỉ trùng thời gian hay không
     public function hasOverlap($employeeId, $startDate, $endDate, $excludeId = null)
     {
         try {
@@ -104,12 +88,7 @@ class LeaveModel extends BaseModel
         }
     }
 
-    /**
-     * Get leave statistics for employee
-     * @param int $employeeId
-     * @param int $year
-     * @return array
-     */
+    // Lấy thống kê đơn xin nghỉ của nhân viên trong năm
     public function getEmployeeStats($employeeId, $year)
     {
         try {
