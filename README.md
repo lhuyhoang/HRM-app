@@ -185,7 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 Trong `backend/config/Config.php`:
 
 ```php
-// Thời gian token hết hạn (giây)
+// Thời gian token hết hạn
 const JWT_EXPIRATION = 86400;  // 24 giờ
 // const JWT_EXPIRATION = 604800;  // 7 ngày
 // const JWT_EXPIRATION = 2592000; // 30 ngày
@@ -1287,7 +1287,6 @@ Nếu phát hiện lỗi, vui lòng tạo issue với thông tin:
 
 ### Liên hệ
 - GitHub: https://github.com/lhuyhoang/HRM-app
-- Email: lhuyhoang@example.com
 
 ==================================
 

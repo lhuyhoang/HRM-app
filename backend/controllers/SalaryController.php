@@ -7,6 +7,8 @@ require_once __DIR__ . '/../utils/Validator.php';
 
 class SalaryController extends BaseController
 {
+    private SalaryModel $model;
+
     // Khởi tạo controller với model tương ứng
     public function __construct()
     {
